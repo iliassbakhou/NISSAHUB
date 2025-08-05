@@ -1,0 +1,34 @@
+<!-- templates/auth/register.html -->
+{% extends "base.html" %}
+
+{% block title %}Register - NissaHub{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <h2>Create Your NissaHub Account</h2>
+        <form id="register-form" class="auth-form" novalidate>
+            <div class="form-group">
+                <label for="register-email">Email Address</label>
+                <input type="email" id="register-email" name="email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password (min. 6 characters)</label>
+                <input type="password" id="register-password" name="password" required minlength="6" autocomplete="new-password">
+            </div>
+             <div class="form-group">
+                <label for="register-confirm-password">Confirm Password</label>
+                <input type="password" id="register-confirm-password" name="confirm-password" required autocomplete="new-password">
+            </div>
+
+            <!-- THE DEFINITIVE FIX: The error message is now INSIDE the form element -->
+            <p class="error-message" style="display: none;"></p>
+            
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+        <div class="auth-links">
+            <p>Already have an account? <a href="{{ url_for('login_page') }}">Login here</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

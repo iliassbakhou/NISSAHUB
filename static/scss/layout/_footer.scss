@@ -1,0 +1,10 @@
+// static/scss/layout/_footer.scss
+@use '../abstracts/variables' as v;
+
+.main-footer {
+    padding: (v.$spacing-unit * 2) v.$spacing-unit;
+    text-align: center;
+    margin-top: auto; // Critical for sticky footer
+    background-color: v.$color-text;
+    color: v.$color-bg-light;
+}

@@ -1,0 +1,12 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_title %}Dashboard Overview{% endblock %}
+
+{% block admin_content %}
+    <p>Welcome to the NissaHub administration panel. This is where you will manage users, courses, and other platform settings.</p>
+    
+    <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <p><a href="{{ url_for('manage_users_page') }}">→ Manage all users on the platform.</a></p>
+    </div>
+{% endblock %}

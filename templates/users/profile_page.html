@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Customer Profile Header -->
+    <section class="creator-profile-header"> {# We can reuse the creator header style for consistency #}
+        <img src="{{ profile_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ profile_user.displayName }}" class="creator-avatar">
+        <div class="creator-info">
+            <h1>{{ profile_user.displayName or 'NissaHub User' }}</h1>
+            <p>{{ profile_user.bio or 'This user has not added a bio yet.' }}</p>
+        </div>
+    </section>
+
+    <!-- Recent Activity Section -->
+    <div class="recent-activity">
+        <h2 class="section-title">Recent Activity</h2>
+        
+        {% if activity %}
+            <div class="activity-feed">
+                {% for item in activity %}
+                    {% if item.type == 'review' %}
+                        <div class="activity-card review-card">
+                            <div class="activity-card-header">
+                                <span class="activity-type">Wrote a review for</span>
+                                <a href="{{ url_for('skill_detail_page', skill_id=item.skill_id) }}" class="activity-link">{{ item.skill.name }}</a>
+                            </div>
+                            <div class="activity-card-body">
+                                <div class="review-stars">
+                                    {% for i in range(1, 6) %}
+                                        <span class="star">{% if i <= item.review.rating %}★{% else %}☆{% endif %}</span>
+                                    {% endfor %}
+                                </div>
+                                <p class="review-text">"{{ item.review.text }}"</p>
+                            </div>
+                            <div class="activity-card-footer">
+                                <small>{{ item.review.created_at.strftime('%B %d, %Y') }}</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-panel-message">
+                <h3>No Recent Activity</h3>
+                <p>{{ profile_user.displayName or 'This user' }} hasn't been active recently.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

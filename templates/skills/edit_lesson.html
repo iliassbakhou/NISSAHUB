@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Edit Lesson - {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+    <div class="page-header-content">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard_page') }}">Dashboard</a> »
+            <a href="{{ url_for('my_skills_page') }}">My Skills</a> »
+            <a href="{{ url_for('manage_lessons_page', skill_id=skill_id) }}">Manage Lessons</a> »
+            <span>Edit</span>
+        </nav>
+        <h1>Edit Lesson</h1>
+        <p>Make changes to your lesson below and click "Update Lesson" to save.</p>
+    </div>
+</section>
+
+<section class="form-section">
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('edit_lesson_page', skill_id=skill_id, lesson_id=lesson_id) }}">
+            <div class="form-group">
+                <label for="lesson-title">Lesson Title</label>
+                <input type="text" id="lesson-title" name="lesson_title" required value="{{ lesson.title or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="lesson-type">Lesson Type</label>
+                <select id="lesson-type" name="lesson_type" required>
+                    <option value="Text" {{ 'selected' if lesson.lesson_type == 'Text' }}>Text Content</option>
+                    <option value="Video" {{ 'selected' if lesson.lesson_type == 'Video' }}>Video Link (YouTube, Vimeo, etc.)</option>
+                </select>
+            </div>
+            
+            <div id="content-fields">
+                <div class="form-group" id="content-text-group">
+                    <label for="content-text">Text Content</label>
+                    <textarea id="content-text" name="content_text" rows="8">{{ lesson.content if lesson.lesson_type == 'Text' else '' }}</textarea>
+                </div>
+                <div class="form-group" id="content-video-group">
+                    <label for="content-video">Video URL</label>
+                    <input type="url" id="content-video" name="content_video" placeholder="https://www.youtube.com/watch?v=..." value="{{ lesson.content if lesson.lesson_type == 'Video' else '' }}">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Lesson</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+/* Breadcrumb and Form styling from other pages, ensures consistency */
+.breadcrumb { font-size: 0.9rem; color: #555; margin-bottom: 1rem; }
+.breadcrumb a { color: #8e44ad; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.form-section { padding: 0 2rem 2rem; }
+.form-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; font-family: inherit; }
+.btn { /* Basic button styles, assuming you have these globally */ display: inline-block; padding: 12px 24px; border: none; border-radius: 5px; background-color: #8e44ad; color: #fff; font-weight: bold; text-decoration: none; cursor: pointer; text-align: center; }
+</style>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const lessonTypeSelect = document.getElementById('lesson-type');
+    const textContentGroup = document.getElementById('content-text-group');
+    const videoContentGroup = document.getElementById('content-video-group');
+
+    function toggleContentFields() {
+        if (lessonTypeSelect && textContentGroup && videoContentGroup) {
+            const selectedType = lessonTypeSelect.value;
+            if (selectedType === 'Video') {
+                textContentGroup.style.display = 'none';
+                videoContentGroup.style.display = 'block';
+            } else {
+                textContentGroup.style.display = 'block';
+                videoContentGroup.style.display = 'none';
+            }
+        }
+    }
+    
+    // Run on page load
+    toggleContentFields();
+
+    // Run when select changes
+    if(lessonTypeSelect) {
+        lessonTypeSelect.addEventListener('change', toggleContentFields);
+    }
+});
+</script>
+{% endblock %}

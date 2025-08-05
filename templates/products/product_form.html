@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container form-container creator-form">
+    <h1>{{ page_title }}</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ form_action }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="product_name">Product Name</label>
+            <input type="text" id="product_name" name="product_name" class="form-control" value="{{ product.name or '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="product_description">Description</label>
+            <textarea id="product_description" name="product_description" class="form-control" rows="6" required>{{ product.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group-row">
+            <div class="form-group">
+                <label for="product_price">Price (MAD)</label>
+                <input type="number" id="product_price" name="product_price" class="form-control" value="{{ product.price or '' }}" required step="0.01" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="product_category">Category</label>
+                <select id="product_category" name="product_category" class="form-control" required>
+                    <option value="">Select a Category...</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if product.category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="product_image">Product Image</label>
+            <input type="file" id="product_image" name="product_image" class="form-control" accept="image/png, image/jpeg, image/webp">
+            {% if product.image_url and 'cloudinary' in product.image_url %}
+                <div class="current-image-preview">
+                    <p>Current Image:</p>
+                    <img src="{{ product.image_url.replace('/upload/', '/upload/w_200,h_200,c_fill/') }}" alt="Current image for {{ product.name }}">
+                </div>
+            {% endif %}
+            <small>Leave blank to keep the current image. A new image will replace the old one.</small>
+        </div>
+
+        <div class="form-group form-actions">
+            <div class="form-switch">
+                <input type="checkbox" id="is_published" name="is_published" value="true" {% if product.isPublished %}checked{% endif %}>
+                <label for="is_published">Publish this product?</label>
+                <small>Uncheck this to save the product as a private draft.</small>
+            </div>
+
+            <div class="button-group">
+                 <a href="{{ url_for('my_products_page') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ 'Update Product' if product.id else 'Add Product' }}</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

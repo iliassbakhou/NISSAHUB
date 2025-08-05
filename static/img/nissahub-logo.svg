@@ -1,0 +1,11 @@
+<svg width="150" height="40" viewBox="0 0 150 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .n-main { fill: #8E44AD; }
+    .n-hub { fill: #333333; }
+    @media (prefers-color-scheme: dark) {
+      .n-hub { fill: #EAEAEA; }
+    }
+  </style>
+  <text x="0" y="30" font-family="'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'" font-size="30" font-weight="bold" class="n-main">Nissa</text>
+  <text x="75" y="30" font-family="'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji'" font-size="30" font-weight="300" class="n-hub">Hub</text>
+</svg>

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+    <div class="page-header-content">
+        <h1>{{ page_title }}</h1>
+        <p>Fill out the form below to {{ 'update your course.' if skill.name else 'add a new course to the platform.' }}</p>
+    </div>
+</section>
+
+<section class="form-section">
+    <div class="form-container">
+        {% set form_action = url_for('edit_skill_page', skill_id=skill_id) if skill.name else url_for('create_skill_page') %}
+
+        <form method="POST" action="{{ form_action }}" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label for="skill-name">Course Title</label>
+                <input type="text" id="skill-name" name="skill_name" required value="{{ skill.name or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="skill-description">Description</label>
+                <textarea id="skill-description" name="skill_description" rows="5" required>{{ skill.description or '' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="skill-category">Category</label>
+                <select id="skill-category" name="skill_category" required>
+                    <option value="" disabled {{ 'selected' if not skill.category }}>-- Select a Category --</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {{ 'selected' if skill.category == category }}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="skill-image">Cover Image</label>
+                {% if skill.image_url and 'cloudinary' in skill.image_url %}
+                    <div class="current-image-preview">
+                        <img src="{{ skill.image_url }}" alt="Current image for {{ skill.name }}">
+                        <small>Current Image. Uploading a new file will replace this one.</small>
+                    </div>
+                {% endif %}
+                <input type="file" id="skill-image" name="skill_image" accept="image/png, image/jpeg">
+            </div>
+
+            {# NEW: Published Status Checkbox #}
+            <div class="form-group form-group-checkbox">
+                {# By default, a new skill should be published. The 'not skill.name' part handles this for the create form. #}
+                <input type="checkbox" id="is_published" name="is_published" value="true" {% if skill.isPublished or not skill.name %}checked{% endif %}>
+                <label for="is_published">Publish this course</label>
+                <small class="field-hint">Uncheck this to save your course as a private draft. It will not be visible to the public but you can still edit it.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                {{ 'Update Course' if skill.name else 'Create Course' }}
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+.current-image-preview img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+}
+/* Style for checkbox group */
+.form-group-checkbox {
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+.form-group-checkbox input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+.form-group-checkbox label {
+    margin-bottom: 0;
+}
+.form-group-checkbox .field-hint {
+    margin-left: auto;
+    color: #555;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

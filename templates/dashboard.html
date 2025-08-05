@@ -1,0 +1,47 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+    <div class="page-header-content">
+        <h1>{{ page_title }}</h1>
+        <p>This is your personal space on NissaHub to manage your account and content.</p>
+    </div>
+</section>
+
+<div class="dashboard-grid">
+    <section class="dashboard-panel">
+        <h3>Account Settings</h3>
+        <p>Manage your profile and account details.</p>
+        <div class="panel-actions">
+            <a href="{{ url_for('edit_profile_page') }}" class="btn btn-primary">Edit Profile</a>
+            <a href="#" class="btn btn-secondary">Change Password</a> {# Placeholder #}
+        </div>
+    </section>
+
+    {# Show creator tools only if the user is a creator #}
+    {% if current_user.role == 'creator' %}
+    <section class="dashboard-panel">
+        <h3>Creator Tools</h3>
+        <p>Add new skills or manage your existing content.</p>
+        <div class="panel-actions">
+            <a href="{{ url_for('create_skill_page') }}" class="btn btn-primary">Add a New Skill</a>
+            <a href="{{ url_for('my_skills_page') }}" class="btn btn-secondary">Manage My Skills</a>
+        </div>
+    </section>
+    {% endif %}
+
+    {# Show customer activity section only if the user is a customer #}
+    {% if current_user.role == 'customer' %}
+    <section class="dashboard-panel">
+        <h3>Your Activity</h3>
+        <p>View your enrolled courses and purchased products.</p>
+        <div class="panel-actions">
+            <a href="#" class="btn btn-secondary">My Enrollments</a> {# Placeholder #}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

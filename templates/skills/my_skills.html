@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+    <div class="page-header-content">
+        <h1>{{ page_title }}</h1>
+        <p>Here you can view, manage, and edit the courses you have created.</p>
+        <div class="page-actions">
+            <a href="{{ url_for('create_skill_page') }}" class="btn btn-primary">Create New Course</a>
+        </div>
+    </div>
+</section>
+
+<section class="table-section">
+    {% if skills %}
+        <div class="table-container">
+            <table class="creator-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Featured</th>
+                        <th>Lessons</th>
+                        <th>Reviews</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for skill in skills %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}" class="skill-title-link" title="View Course Page">
+                                {{ skill.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if skill.get('isPublished') %}
+                                <span class="status-published">Published</span>
+                            {% else %}
+                                <span class="status-draft">Draft</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if skill.get('isFeatured') %}
+                                <span class="status-featured">Yes ★</span>
+                            {% else %}
+                                <span class="status-not-featured">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ skill.lesson_count }}</td>
+                        <td>{{ skill.review_count }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('manage_lessons_page', skill_id=skill.id) }}" class="btn btn-small btn-manage">Manage Lessons</a>
+                                <a href="{{ url_for('edit_skill_page', skill_id=skill.id) }}" class="btn btn-small btn-edit">Edit Details</a>
+                                <form action="{{ url_for('delete_skill', skill_id=skill.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this course? This cannot be undone.');">
+                                    <button type="submit" class="btn btn-small btn-delete">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-content-message">
+            <h2>You haven't created any courses yet.</h2>
+            <p>Let's get started and share your talents with the community!</p>
+            <a href="{{ url_for('create_skill_page') }}" class="btn btn-primary">Create Your First Course</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+.table-section { max-width: 1200px; margin: 0 auto; padding: 0 2rem 2rem 2rem; }
+.page-actions { margin-top: 1.5rem; }
+.table-container { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.creator-table { width: 100%; border-collapse: collapse; }
+.creator-table th, .creator-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+.creator-table th { background-color: #f8f9fa; font-weight: bold; }
+.creator-table tbody tr:hover { background-color: #f5f5f5; }
+.creator-table tbody tr:last-child td { border-bottom: none; }
+.skill-title-link { font-weight: bold; color: #8e44ad; text-decoration: none; }
+.skill-title-link:hover { text-decoration: underline; }
+
+.status-published { color: #2ecc71; font-weight: bold; }
+.status-draft { color: #7f8c8d; }
+.status-featured { color: #f39c12; font-weight: bold; }
+.status-not-featured { color: #7f8c8d; }
+
+.action-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.btn-small { padding: 6px 12px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.85rem; border: none; cursor: pointer; text-align: center; color: white; transition: opacity 0.2s; }
+.btn-small:hover { opacity: 0.85; }
+
+.btn-manage { background-color: #27ae60; }
+.btn-edit { background-color: #3498db; }
+.btn-delete { background-color: #e74c3c; }
+
+.creator-table form { margin: 0; }
+.no-content-message { text-align: center; padding: 4rem; background: #fdfdff; border-radius: 8px; margin-top: 2rem; }
+.no-content-message h2 { margin-top: 0; }
+.no-content-message .btn { margin-top: 1rem; }
+</style>
+{% endblock %}

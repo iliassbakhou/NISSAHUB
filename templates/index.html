@@ -1,0 +1,59 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Welcome to NissaHub - Learn & Earn{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Welcome to NissaHub!</h1>
+            <p>A safe, private platform for Moroccan women to learn and earn.</p>
+        </div>
+    </section>
+
+    {% if featured_skills %}
+    <section class="courses-section">
+        <h2 class="section-title">Featured Courses</h2>
+        <div class="card-grid">
+            {% for skill in featured_skills %}
+            <div class="card">
+                <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
+                    <div class="card-image-wrapper">
+                        <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}" loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <span class="card-category">{{ skill.category }}</span>
+                        <h3 class="card-title">{{ skill.name }}</h3>
+                        <p class="card-description">{{ skill.description | truncate(100, True) }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if recent_skills %}
+    <section class="courses-section">
+        <h2 class="section-title">Recently Added</h2>
+        <div class="card-grid">
+            {% for skill in recent_skills %}
+            <div class="card">
+                <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
+                     <div class="card-image-wrapper">
+                        <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}" loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <span class="card-category">{{ skill.category }}</span>
+                        <h3 class="card-title">{{ skill.name }}</h3>
+                        <p class="card-description">{{ skill.description | truncate(100, True) }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

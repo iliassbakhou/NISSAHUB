@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Manage Lessons - {{ skill.name }}{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+    <div class="page-header-content">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard_page') }}">Dashboard</a> »
+            <a href="{{ url_for('my_skills_page') }}">My Courses</a> »
+            <span>Manage</span>
+        </nav>
+        <h1>Manage Lessons for "{{ skill.name }}"</h1>
+        
+        {# NEW: Status Badges Section #}
+        <div class="status-badges-container">
+            {% if skill.isPublished %}
+                <span class="status-badge status-published">Published</span>
+            {% else %}
+                <span class="status-badge status-draft">Draft</span>
+            {% endif %}
+
+            {% if skill.isFeatured %}
+                <span class="status-badge status-featured">★ Featured by Admin</span>
+            {% endif %}
+        </div>
+
+        <p>Add, edit, and reorder the lessons that make up your course.</p>
+    </div>
+</section>
+
+<div class="management-layout">
+    <!-- Lesson List Section -->
+    <section class="lesson-list-section">
+        <h2>Existing Lessons</h2>
+        {% if lessons %}
+            <ul class="lesson-list">
+                {% for lesson in lessons %}
+                <li class="lesson-item">
+                    <div class="lesson-item-order">
+                        <div class="order-number">{{ loop.index }}</div>
+                        <div class="order-controls">
+                            {% if not loop.first %}
+                                <a href="{{ url_for('reorder_lesson', skill_id=skill_id, lesson_id=lesson.id, direction='up') }}" class="btn-tiny btn-order" title="Move Up">▲</a>
+                            {% endif %}
+                            {% if not loop.last %}
+                                <a href="{{ url_for('reorder_lesson', skill_id=skill_id, lesson_id=lesson.id, direction='down') }}" class="btn-tiny btn-order" title="Move Down">▼</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="lesson-item-details">
+                        <span class="lesson-item-type">[{{ lesson.lesson_type | capitalize }}]</span>
+                        <span class="lesson-item-title">{{ lesson.title }}</span>
+                    </div>
+                    <div class="lesson-item-actions">
+                        <a href="{{ url_for('edit_lesson_page', skill_id=skill_id, lesson_id=lesson.id) }}" class="btn-tiny btn-edit">Edit</a>
+                        <form action="{{ url_for('delete_lesson', skill_id=skill_id, lesson_id=lesson.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this lesson?');" style="display: inline;">
+                           <button type="submit" class="btn-tiny btn-delete">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="no-lessons-message">
+                <p>No lessons have been added to this course yet. Use the form to add the first one!</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Add Lesson Form Section (no changes here) -->
+    <section class="add-lesson-section">
+        <h2>Add New Lesson</h2>
+        <form method="POST" action="{{ url_for('manage_lessons_page', skill_id=skill_id) }}">
+            <div class="form-group">
+                <label for="lesson-title">Lesson Title</label>
+                <input type="text" id="lesson-title" name="lesson_title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lesson-type">Lesson Type</label>
+                <select id="lesson-type-add" name="lesson_type" required>
+                    <option value="Text" selected>Text Content</option>
+                    <option value="Video">Video Link (YouTube, Vimeo, etc.)</option>
+                </select>
+            </div>
+            
+            <div id="content-fields-add">
+                <div class="form-group" id="content-text-group-add">
+                    <label for="content-text">Text Content (supports simple line breaks)</label>
+                    <textarea id="content-text-add" name="content_text" rows="8"></textarea>
+                </div>
+                <div class="form-group" id="content-video-group-add" style="display: none;">
+                    <label for="content-video">Video URL</label>
+                    <input type="url" id="content-video-add" name="content_video" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Lesson</button>
+        </form>
+    </section>
+</div>
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+.breadcrumb { font-size: 0.9rem; color: #555; margin-bottom: 1rem; }
+.breadcrumb a { color: #8e44ad; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* New Status Badges Styles */
+.status-badges-container {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: white;
+}
+.status-published { background-color: #27ae60; }
+.status-draft { background-color: #7f8c8d; }
+.status-featured { background-color: #f39c12; }
+
+.management-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+@media (max-width: 900px) { .management-layout { grid-template-columns: 1fr; } }
+
+.lesson-list-section, .add-lesson-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+.lesson-list-section h2, .add-lesson-section h2 { margin-top: 0; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+.lesson-list { list-style: none; padding: 0; margin: 0; }
+
+.lesson-item { display: flex; align-items: stretch; padding: 0.5rem; border-radius: 5px; transition: background-color 0.2s; }
+.lesson-item:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+.lesson-item:hover { background-color: #f9f9f9; }
+
+.lesson-item-order { display: flex; align-items: center; padding-right: 1rem; border-right: 1px solid #eee; margin-right: 1rem; }
+.order-number { font-size: 1.25rem; font-weight: bold; color: #aaa; margin-right: 0.75rem; }
+.order-controls { display: flex; flex-direction: column; }
+.btn-order { color: #888; text-decoration: none; font-size: 1.2rem; line-height: 1; padding: 0.1rem; }
+.btn-order:hover { color: #000; }
+.lesson-item-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 0.5rem 0; }
+.lesson-item-type { font-weight: bold; color: #555; margin-bottom: 0.25rem; font-size: 0.8rem; }
+.lesson-item-title { font-size: 1rem; }
+.lesson-item-actions { display: flex; align-items: center; gap: 0.5rem; padding-left: 1rem; }
+
+.btn-tiny { font-size: 0.8rem; padding: 4px 8px; text-decoration: none; border-radius: 4px; color: white; font-weight: normal; border: none; cursor: pointer; }
+.btn-tiny.btn-edit { background-color: #3498db; }
+.btn-tiny.btn-delete { background-color: #e74c3c; }
+.no-lessons-message { text-align: center; color: #777; padding: 2rem; }
+.add-lesson-section .form-group { margin-bottom: 1rem; }
+.add-lesson-section .btn-primary { margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const lessonTypeSelect = document.getElementById('lesson-type-add');
+    const textContentGroup = document.getElementById('content-text-group-add');
+    const videoContentGroup = document.getElementById('content-video-group-add');
+    
+    if (lessonTypeSelect) {
+        lessonTypeSelect.addEventListener('change', (event) => {
+            const selectedType = event.target.value;
+            if (selectedType === 'Video') {
+                textContentGroup.style.display = 'none';
+                videoContentGroup.style.display = 'block';
+            } else {
+                textContentGroup.style.display = 'block';
+                videoContentGroup.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

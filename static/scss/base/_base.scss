@@ -1,0 +1,72 @@
+// static/scss/base/_base.scss
+@use '../abstracts/variables' as v;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: v.$font-primary;
+    line-height: 1.6;
+    background-color: v.$color-bg-light;
+    color: v.$color-text;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.main-content {
+    flex-grow: 1;
+    padding: (v.$spacing-unit * 2) 0;
+}
+
+.container {
+    max-width: v.$container-max-width;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 v.$spacing-unit;
+}
+
+a {
+    color: v.$color-primary;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+        text-decoration: underline;
+        color: v.$color-primary-dark;
+    }
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: v.$color-primary-dark;
+    line-height: 1.3;
+    margin-bottom: v.$spacing-unit;
+}
+
+h1 { font-size: v.$font-size-h1; }
+h2 { font-size: v.$font-size-h2; }
+h3 { font-size: 1.75rem; }
+
+p {
+    margin-bottom: v.$spacing-unit * 1.25;
+}
+
+// Global helper for elements hidden by default, revealed by JS
+.nav-item-hidden {
+    display: none !important;
+}

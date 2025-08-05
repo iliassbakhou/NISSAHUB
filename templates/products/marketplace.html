@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{ page_title | default("Marketplace", true) }}</h1>
+        <p>Discover unique digital goods and creations from talented Moroccan women.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if products %}
+    <div class="card-grid">
+        {% for product in products %}
+            <div class="card">
+                <a href="{{ url_for('product_detail_page', product_id=product.id) }}">
+                    <div class="card-image-wrapper" style="aspect-ratio: 1 / 1;">
+                        <img 
+                            src="{{ product.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" 
+                            alt="Image for {{ product.name | default('product', true) }}" 
+                            loading="lazy"
+                        >
+                    </div>
+                </a>
+                <div class="card-content">
+                    <h3 class="card-title">{{ product.name | default('Untitled Product', true) }}</h3>
+                    <p class="card-description"></p> {# Ensures consistent spacing #}
+                    <div class="card-footer">
+                        {% if product.author %}
+                        <a href="{{ url_for('creator_profile_page', creator_id=product.author_id) }}" class="card-author-link">
+                            <img src="{{ product.author.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" class="author-avatar-small" alt="">
+                            <span>{{ product.author.displayName | default('NissaHub Creator') }}</span>
+                        </a>
+                        {% endif %}
+                        <span class="card-price">{{ "%.2f MAD"|format(product.price | float(default=0.0)) }}</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="no-results-message">
+            <h2>The Marketplace is Quiet... For Now.</h2>
+            <p>No products have been published yet. Check back soon for amazing creations!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

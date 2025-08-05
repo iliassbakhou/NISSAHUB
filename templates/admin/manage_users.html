@@ -1,0 +1,139 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Users - NissaHub{% endblock %}
+
+{% block admin_content %}
+    <h2>User Management</h2>
+    <p>Here you can view all registered users and manage their roles and account status.</p>
+    
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th> {# New Column #}
+                    <th>Registered</th>
+                    <th>Admin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="{% if user.isDisabled %}disabled-row{% endif %}">
+                    <td><img src="{{ user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" class="table-avatar" alt="avatar"></td>
+                    <td>{{ user.displayName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><span class="role-badge role-{{ user.role or 'none' }}">{{ (user.role or 'N/A')|capitalize }}</span></td>
+                    {# New Column Data #}
+                    <td>
+                        {% if user.get('isDisabled') %}
+                            <span class="status-disabled">Disabled</span>
+                        {% else %}
+                            <span class="status-active">Active</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.createdAt.strftime('%b %d, %Y') if user.createdAt else 'N/A' }}</td>
+                    <td>
+                        {% if user.get('isAdmin') %}
+                            <span class="status-yes">Yes</span>
+                        {% else %}
+                            <span class="status-no">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if current_user.uid != user.uid %}
+                            <div class="action-buttons">
+                                <form method="POST" action="{{ url_for('toggle_admin_status', user_id=user.uid) }}" style="margin:0;">
+                                    {% if user.get('isAdmin') %}
+                                        <button type="submit" class="btn btn-small btn-warning">Revoke Admin</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-small btn-success">Make Admin</button>
+                                    {% endif %}
+                                </form>
+                                <form method="POST" action="{{ url_for('toggle_disable_status', user_id=user.uid) }}" style="margin:0;">
+                                    {% if user.get('isDisabled') %}
+                                        <button type="submit" class="btn btn-small btn-info">Enable User</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-small btn-danger">Disable User</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        {% else %}
+                            (You)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block styles_extra %}
+{{ super() }}
+<style>
+    .admin-table-container {
+        overflow-x: auto;
+    }
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+    }
+    .admin-table th, .admin-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        white-space: nowrap;
+    }
+    .admin-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .admin-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    .disabled-row {
+        background-color: #fee;
+        color: #999;
+    }
+    .disabled-row:hover {
+        background-color: #fdd;
+    }
+    .table-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        vertical-align: middle;
+    }
+    .role-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: #fff;
+    }
+    .role-creator { background-color: #8e44ad; }
+    .role-customer { background-color: #3498db; }
+    .role-none { background-color: #7f8c8d; }
+    .status-active, .status-yes { color: #2ecc71; font-weight: bold; }
+    .status-disabled, .status-no { color: #e74c3c; font-weight: bold; }
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .btn-small { padding: 5px 10px; font-size: 0.8rem; white-space: nowrap; }
+    .btn-success { background-color: #2ecc71; border-color: #27ae60; color: white; }
+    .btn-warning { background-color: #f39c12; border-color: #e67e22; color: white; }
+    .btn-danger { background-color: #e74c3c; border-color: #c0392b; color: white; }
+    .btn-info { background-color: #3498db; border-color: #2980b9; color: white; }
+</style>
+{% endblock %}

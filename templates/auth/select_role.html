@@ -1,0 +1,100 @@
+<!-- templates/auth/select_role.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container" style="max-width: 700px;">
+        <h2>One Last Step: Choose Your Role</h2>
+        <p>This helps us tailor your experience on NissaHub. This choice cannot be changed later.</p>
+
+        {% if error %}
+            <p class="error-message" style="display: block;">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('select_role_page') }}" class="role-selection-form">
+            <div class="role-options">
+                <label for="role-customer" class="role-option">
+                    <input type="radio" id="role-customer" name="role" value="customer" required>
+                    <div class="role-option-content">
+                        <div class="role-icon">🎨</div>
+                        <h3 class="role-title">I'm a Customer</h3>
+                        <p class="role-description">I'm here to browse, learn new skills, and purchase creative products.</p>
+                    </div>
+                </label>
+
+                <label for="role-creator" class="role-option">
+                    <input type="radio" id="role-creator" name="role" value="creator" required>
+                    <div class="role-option-content">
+                        <div class="role-icon">👩‍🏫</div>
+                        <h3 class="role-title">I'm a Creator</h3>
+                        <p class="role-description">I want to create courses, sell digital products, and share my skills.</p>
+                    </div>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 20px;">Complete My Profile</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+/* Simple styling for the role selection page */
+.role-options {
+    display: flex;
+    gap: 20px;
+    margin-top: 2rem;
+}
+.role-option {
+    flex: 1;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    position: relative; /* For the radio button */
+}
+.role-option:hover {
+    border-color: #A367B1; /* A nice purple from your likely palette */
+    transform: translateY(-5px);
+}
+.role-option input[type="radio"] {
+    /* Hide the default radio button */
+    opacity: 0;
+    position: fixed;
+    width: 0;
+}
+.role-option input[type="radio"]:checked + .role-option-content {
+    /* Style when selected */
+    outline: 3px solid #A367B1;
+    border-radius: 6px;
+}
+.role-option-content {
+    padding: 10px;
+}
+.role-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.role-title {
+    margin-bottom: 0.5rem;
+}
+.role-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+}
+</style>
+{% endblock %}

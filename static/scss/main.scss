@@ -1,0 +1,24 @@
+// static/scss/main.scss
+
+// 1. Abstracts: Variables, functions, mixins. No CSS output.
+@use 'abstracts/variables';
+
+// 2. Base styles: Resets, typography, global element styles.
+@use 'base/base';
+
+// 3. Components: Reusable UI elements.
+@use 'components/buttons';
+@use 'components/forms';
+@use 'components/card';
+
+// 4. Layout: Major structural parts of the site.
+@use 'layout/header';
+@use 'layout/footer';
+@use 'layout/grid';
+
+// 5. Page-specific styles: Styles for individual pages.
+@use 'pages/home';
+@use 'pages/marketplace';
+@use 'pages/my-creations';
+@use 'pages/skills';
+@use 'pages/admin'; // New import for admin styles

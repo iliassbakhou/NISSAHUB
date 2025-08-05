@@ -1,0 +1,37 @@
+// static/scss/pages/_home.scss
+@use '../abstracts/variables' as v;
+
+.hero-section {
+    background-color: v.$color-white;
+    padding: (v.$spacing-unit * 4) (v.$spacing-unit * 2);
+    border-radius: v.$border-radius;
+    text-align: center;
+    margin-bottom: (v.$spacing-unit * 3);
+    border: 1px solid v.$color-border;
+
+    .hero-content {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+
+    .hero-subtitle {
+        font-size: v.$font-size-large;
+        color: v.$color-text;
+        margin-bottom: v.$spacing-unit * 1.5;
+    }
+}
+
+.page-section-header {
+    text-align: center;
+    margin-bottom: (v.$spacing-unit * 2.5);
+
+    h2 {
+        margin-bottom: v.$spacing-unit * 0.5;
+    }
+
+    p {
+        max-width: 600px;
+        margin: 0 auto;
+        color: v.$color-text-light;
+    }
+}

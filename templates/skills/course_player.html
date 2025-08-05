@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% macro get_youtube_embed_url(url) -%}
+    {%- if 'youtube.com/watch?v=' in url -%}
+        {{ url.split('v=')[1].split('&')[0] }}
+    {%- elif 'youtu.be/' in url -%}
+        {{ url.split('youtu.be/')[1].split('?')[0] }}
+    {%- else -%}
+        {{ none }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% block title %}{{ active_lesson.title }} - {{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="course-player-container">
+    <aside class="course-sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('skill_detail_page', skill_id=skill_id) }}" class="back-link">« Back to Course Details</a>
+            <h2>{{ skill.name }}</h2>
+        </div>
+        <nav class="lesson-nav-list">
+            <ul>
+                {% for lesson in all_lessons %}
+                    <li>
+                        <a href="{{ url_for('course_player_page', skill_id=skill_id, lesson_id=lesson.id) }}" 
+                           class="lesson-link {% if lesson.id == active_lesson.id %}is-active{% endif %}">
+                            <span class="lesson-link-icon">
+                                {% if lesson.lesson_type == 'Video' %}📹{% else %}📄{% endif %}
+                            </span>
+                            <span class="lesson-link-title">{{ lesson.title }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="course-main-content">
+        <div class="lesson-content-area">
+            <h1>{{ active_lesson.title }}</h1>
+
+            <div class="lesson-body">
+                {% if active_lesson.lesson_type == 'Text' %}
+                    <p>{{ active_lesson.content | nl2br | safe }}</p>
+                {% elif active_lesson.lesson_type == 'Video' %}
+                    {% set video_id = get_youtube_embed_url(active_lesson.content) %}
+                    {% if video_id %}
+                    <div class="video-responsive">
+                        <iframe src="https://www.youtube.com/embed/{{ video_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    {% else %}
+                    <p class="error-message">Invalid or unsupported video link.</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- NEW: LESSON NAVIGATION BUTTONS -->
+            <div class="lesson-navigation-buttons">
+                {% if previous_lesson %}
+                    <a href="{{ url_for('course_player_page', skill_id=skill_id, lesson_id=previous_lesson.id) }}" class="btn btn-secondary">
+                        « Previous: {{ previous_lesson.title | truncate(20, True) }}
+                    </a>
+                {% else %}
+                    {# This empty div keeps the 'Next' button on the right when it's alone #}
+                    <div></div>
+                {% endif %}
+                
+                {% if next_lesson %}
+                    <a href="{{ url_for('course_player_page', skill_id=skill_id, lesson_id=next_lesson.id) }}" class="btn btn-primary">
+                        Next: {{ next_lesson.title | truncate(20, True) }} »
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block styles_extra %}
+<style>
+/* ... (all previous styles are the same, just adding button styles here) ... */
+.main-header, .main-footer { display: none; }
+body { background-color: #f4f5f7; }
+.course-player-container { display: flex; min-height: 100vh; }
+.course-sidebar { width: 320px; background-color: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 1.5rem; border-bottom: 1px solid #e0e0e0; }
+.sidebar-header .back-link { font-size: 0.9rem; color: #555; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+.sidebar-header .back-link:hover { text-decoration: underline; }
+.sidebar-header h2 { font-size: 1.2rem; margin: 0; }
+.lesson-nav-list { overflow-y: auto; flex-grow: 1; }
+.lesson-nav-list ul { list-style: none; padding: 0.5rem 0; }
+.lesson-link { display: flex; align-items: center; padding: 0.75rem 1.5rem; text-decoration: none; color: #333; border-left: 4px solid transparent; }
+.lesson-link:hover { background-color: #f9f9f9; }
+.lesson-link.is-active { background-color: #f3e5f5; border-left-color: #8e44ad; font-weight: bold; }
+.lesson-link-icon { margin-right: 0.75rem; }
+.course-main-content { flex-grow: 1; padding: 2rem 4rem; }
+.lesson-content-area { max-width: 800px; margin: 0 auto; }
+.lesson-content-area h1 { margin-top: 0; }
+.lesson-body { margin-top: 2rem; line-height: 1.7; font-size: 1.1rem; }
+.video-responsive { overflow: hidden; padding-bottom: 56.25%; position: relative; height: 0; border-radius: 8px; }
+.video-responsive iframe { left: 0; top: 0; height: 100%; width: 100%; position: absolute; }
+
+/* NEW Navigation Button Styles */
+.lesson-navigation-buttons { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e0e0e0; }
+.btn { text-decoration: none; border-radius: 5px; padding: 12px 24px; font-weight: bold; border: 1px solid transparent; }
+.btn-primary { background-color: #8e44ad; color: #fff; }
+.btn-secondary { background-color: #f1f3f5; color: #495057; border-color: #dee2e6; }
+</style>
+{% endblock %}

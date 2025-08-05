@@ -1,0 +1,44 @@
+// static/scss/components/_buttons.scss
+@use '../abstracts/variables' as v;
+@use 'sass:color';
+
+.btn {
+    display: inline-block;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: v.$font-size-base;
+    font-family: v.$font-primary;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+    &:hover {
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+}
+
+.btn-primary {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+        background-color: color.adjust(v.$color-primary, $lightness: -5%, $saturation: 5%);
+        color: v.$color-white;
+    }
+}
+
+.btn-primary-sm {
+    @extend .btn;
+    @extend .btn-primary;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}

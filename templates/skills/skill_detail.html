@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="skill-detail-container">
+        <div class="skill-detail-main">
+            <h1 class="skill-title">{{ skill.name }}</h1>
+            <div class="skill-meta">
+                {% if review_summary.count > 0 %}
+                <div class="meta-rating">
+                    <span class="meta-rating-stars">
+                        {% for i in range(1, 6) %}
+                            {% if i <= review_summary.average %}★
+                            {% else %}☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>{{ review_summary.average }} ({{ review_summary.count }} review{% if review_summary.count != 1 %}s{% endif %})</span>
+                </div>
+                {% endif %}
+                <span>By: <a href="{{ url_for('creator_profile_page', creator_id=skill.author_id) }}">{{ author.displayName or skill.author_email }}</a></span>
+                <span>Category: <span class="skill-category-badge">{{ skill.category }}</span></span>
+            </div>
+
+            <div class="skill-image-container">
+                <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}">
+            </div>
+
+            <div class="skill-description-full">
+                <h2>About this Course</h2>
+                <p>{{ skill.description | nl2br | safe }}</p>
+            </div>
+
+            <div class="course-content-section">
+                <h2>Course Content</h2>
+                {% if lessons %}
+                    <ul>
+                        {% for lesson in lessons %}
+                            <li>{{ lesson.title }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>The creator has not added any lessons to this course yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="discussion-section">
+                <h2>Discussion</h2>
+                <form id="discussion-form" data-skill-id="{{ skill.id }}">
+                    <div class="form-group discussion-input-group">
+                        <img class="discussion-post-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
+                        <textarea name="content" placeholder="Ask a question..." rows="2" required></textarea>
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
+                </form>
+                <div id="discussion-list" data-skill-id="{{ skill.id }}" data-skill-author-id="{{ skill.author_id }}" data-current-user-id="{{ current_user.uid }}">
+                    {% if discussions %}
+                        {% for post in discussions %}
+                            {# Discussion threads will be dynamically rendered by JavaScript #}
+                        {% endfor %}
+                    {% else %}
+                        <p id="no-discussions-message">Be the first to start the discussion!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="reviews-display-section">
+                <h2>Reviews ({{ review_summary.count }})</h2>
+                <div class="review-list">
+                    {% for review in reviews %}
+                    <article class="review-card">
+                        <img class="review-avatar" src="{{ review.user_profile.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="">
+                        <div>
+                            <span class="review-author-name">{{ review.user_profile.displayName or "Anonymous User" }}</span>
+                            <div class="review-stars">
+                                {% for i in range(review.rating) %}★{% endfor %}
+                            </div>
+                            <p>{{ review.text | nl2br | safe }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="review-form-section">
+                <h2>Leave a Review</h2>
+                <form method="POST" action="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required/><label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4"/><label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3"/><label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2"/><label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1"/><label for="star1">★</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-text">Your Review</label>
+                        <textarea id="review-text" name="review_text" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="skill-detail-sidebar">
+            <div class="sidebar-card">
+                <h3>Start Learning</h3>
+                {% if lessons %}
+                    <p>Access all {{ lessons | length }} lessons of this course now.</p>
+                    <a href="{{ url_for('course_player_page', skill_id=skill.id, lesson_id=lessons[0].id) }}" class="btn btn-primary btn-block">Go to Course</a>
+                {% else %}
+                    <p>This course doesn't have any lessons yet.</p>
+                    <button class="btn btn-primary btn-block" disabled>Coming Soon</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

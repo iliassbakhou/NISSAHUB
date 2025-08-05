@@ -1,0 +1,21 @@
+// static/scss/pages/_skills.scss
+@use '../abstracts/variables' as v;
+@use 'sass:color';
+
+.skill-detail-container {
+    display: grid;
+    gap: v.$spacing-unit * 2;
+    grid-template-columns: 1fr;
+
+    @media(min-width: 1024px){
+        grid-template-columns: 2.5fr 1fr;
+    }
+}
+
+.skill-detail-main,
+.skill-detail-sidebar .sidebar-card {
+    background-color: v.$color-white;
+    padding: v.$spacing-unit * 1.5;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+}

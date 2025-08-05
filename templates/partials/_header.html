@@ -1,0 +1,73 @@
+<!-- templates/partials/_header.html -->
+<header class="main-header">
+    <div class="header-content container">
+        <a href="{{ url_for('home') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='img/nissahub-logo.svg') }}" alt="NissaHub Logo">
+        </a>
+        
+        <!-- DESKTOP NAVIGATION -->
+        <nav class="desktop-nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            {% if current_user %}
+                <a href="{{ url_for('skills_page') }}">Courses</a>
+                <a href="{{ url_for('marketplace_page') }}">Marketplace</a>
+                <a href="#">Community</a>
+            {% endif %}
+        </nav>
+        
+        <!-- DESKTOP USER ACTIONS -->
+        <div class="user-actions desktop-nav">
+            {% if current_user.uid %}
+                <div class="user-menu-dropdown">
+                    <button class="user-menu-button">
+                        <img class="avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
+                        <span>{{ current_user.displayName or current_user.email.split('@')[0] }}</span>
+                        <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="dropdown-content">
+                        {% if current_user.isAdmin %}<a href="{{ url_for('admin_dashboard_page') }}">Admin Dashboard</a>{% endif %}
+                        <a href="{{ url_for('dashboard_page') }}">Dashboard</a>
+                        {% if current_user.role == 'creator' %}<a href="{{ url_for('creator_profile_page', creator_id=current_user.uid) }}">My Public Profile</a>{% endif %}
+                        <a href="{{ url_for('edit_profile_page') }}">Edit Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" id="logout-link">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login_page') }}">Login</a>
+                <a href="{{ url_for('register_page') }}" class="btn-primary-sm">Register</a>
+            {% endif %}
+        </div>
+
+        <!-- MOBILE NAV OPENER -->
+        <button class="mobile-nav-opener" id="mobile-nav-opener" aria-label="Open navigation menu">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+</header>
+
+<!-- MOBILE NAVIGATION PANEL -->
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+    <button class="mobile-nav-closer" id="mobile-nav-closer" aria-label="Close navigation menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <nav class="mobile-nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if current_user %}
+            <a href="{{ url_for('skills_page') }}">Courses</a>
+            <a href="{{ url_for('marketplace_page') }}">Marketplace</a>
+            <a href="#">Community</a>
+            <div class="mobile-nav-divider"></div>
+            {% if current_user.isAdmin %}<a href="{{ url_for('admin_dashboard_page') }}">Admin Dashboard</a>{% endif %}
+            <a href="{{ url_for('dashboard_page') }}">Dashboard</a>
+            {% if current_user.role == 'creator' %}<a href="{{ url_for('creator_profile_page', creator_id=current_user.uid) }}">My Public Profile</a>{% endif %}
+            <a href="{{ url_for('edit_profile_page') }}">Edit Profile</a>
+            <div class="mobile-nav-divider"></div>
+            <a href="#" id="mobile-logout-link">Logout</a>
+        {% else %}
+            <div class="mobile-nav-divider"></div>
+            <a href="{{ url_for('login_page') }}">Login</a>
+            <a href="{{ url_for('register_page') }}">Register</a>
+        {% endif %}
+    </nav>
+</div>

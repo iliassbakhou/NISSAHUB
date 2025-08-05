@@ -1,0 +1,192 @@
+// static/scss/pages/_admin.scss
+@use '../abstracts/variables' as v;
+@use 'sass:color';
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    max-width: 1400px;
+    margin: (v.$spacing-unit * 2) auto;
+    gap: v.$spacing-unit * 2;
+    padding: 0 v.$spacing-unit * 2;
+}
+
+.admin-sidebar {
+    background-color: v.$color-white;
+    padding: v.$spacing-unit * 1.5;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+    align-self: start;
+    position: sticky;
+    top: v.$spacing-unit * 2;
+}
+
+.admin-nav-header {
+    margin: 0 0 v.$spacing-unit 0;
+    font-size: 1.2rem;
+    color: v.$color-text;
+    padding-bottom: v.$spacing-unit * 0.75;
+    border-bottom: 1px solid v.$color-border;
+}
+
+.admin-nav-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: v.$color-text-light;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+
+    &:hover {
+        background-color: v.$color-bg-light;
+        color: v.$color-primary;
+        text-decoration: none;
+    }
+    &.active {
+        background-color: v.$color-primary;
+        color: v.$color-white;
+        font-weight: 700;
+    }
+    &.disabled {
+        color: #aaa;
+        cursor: not-allowed;
+        &:hover { background-color: transparent; }
+    }
+}
+
+.admin-main-content {
+    min-width: 0;
+}
+
+.admin-header h1 {
+    font-size: 2.2rem;
+    color: v.$color-primary-dark;
+    border-bottom: 1px solid v.$color-border;
+    padding-bottom: v.$spacing-unit;
+    margin-bottom: v.$spacing-unit * 2;
+}
+
+.admin-content-area {
+    background: v.$color-white;
+    padding: v.$spacing-unit * 2;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+
+    p {
+        line-height: 1.7;
+        max-width: 75ch;
+    }
+}
+
+.quick-actions {
+    margin-top: v.$spacing-unit * 2;
+    background-color: v.$color-bg-light;
+    border: 1px solid v.$color-border;
+    border-left: 4px solid v.$color-primary;
+    padding: v.$spacing-unit * 1.5;
+    border-radius: v.$border-radius;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: v.$spacing-unit;
+        color: v.$color-primary-dark;
+    }
+    
+    a {
+        font-weight: 500;
+    }
+}
+
+/* --- NEW: Admin Table Styles --- */
+.admin-table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+        padding: v.$spacing-unit;
+        text-align: left;
+        border-bottom: 1px solid v.$color-border;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    thead th {
+        background-color: v.$color-bg-light;
+        color: v.$color-text-light;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    tbody tr:hover {
+        background-color: color.adjust(v.$color-bg-light, $lightness: -2%);
+    }
+
+    .table-cell-main-text {
+        font-weight: 500;
+    }
+
+    .table-cell-sub-text {
+        font-size: 0.85rem;
+        color: v.$color-text-light;
+        margin-top: 2px;
+    }
+
+    .category-badge {
+        background-color: color.adjust(v.$color-primary, $alpha: -0.9);
+        color: v.$color-primary;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+
+        .btn {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid v.$color-text-light;
+            color: v.$color-text-light;
+            &:hover { background-color: v.$color-text-light; color: v.$color-white; }
+        }
+
+        .btn-primary-outline {
+            background-color: transparent;
+            border: 1px solid v.$color-primary;
+            color: v.$color-primary;
+            &:hover { background-color: v.$color-primary; color: v.$color-white; }
+        }
+    }
+    .table-no-results {
+        text-align: center;
+        padding: (v.$spacing-unit * 3) 0;
+        color: v.$color-text-light;
+    }
+}
+
+// Media Query for responsive admin layout
+@media (max-width: 900px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+    .admin-sidebar {
+        position: static;
+        margin-bottom: v.$spacing-unit * 2;
+    }
+}

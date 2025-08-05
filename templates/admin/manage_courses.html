@@ -1,0 +1,65 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Courses - NissaHub{% endblock %}
+
+{% block admin_content %}
+    <h2>Course Management</h2>
+    <p>View all courses on the platform. You can override their published status or feature them to appear on the homepage.</p>
+    
+    <div class="admin-table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Featured</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>
+                        <div class="table-cell-main-text">{{ course.name }}</div>
+                        <div class="table-cell-sub-text">ID: {{ course.id }}</div>
+                    </td>
+                    <td>{{ course.author_name or 'N/A' }}</td>
+                    <td><span class="category-badge">{{ course.category }}</span></td>
+                    <td>
+                        {% if course.isPublished %}
+                            <span class="status-tag published">Published</span>
+                        {% else %}
+                            <span class="status-tag draft">Draft</span>
+                        {% endif %}
+                    </td>
+                     <td>
+                        {% if course.isFeatured %}
+                            <span class="status-tag featured">Yes</span>
+                        {% else %}
+                             <span class="status-tag neutral">No</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ course.created_at.strftime('%b %d, %Y') if course.created_at else 'N/A' }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <form method="POST" action="{{ url_for('toggle_publish_status', skill_id=course.id) }}" style="margin:0;">
+                                <button type="submit" class="btn btn-sm btn-outline">{{ 'Unpublish' if course.isPublished else 'Publish' }}</button>
+                            </form>
+                             <form method="POST" action="{{ url_for('toggle_feature_status', skill_id=course.id) }}" style="margin:0;">
+                                <button type="submit" class="btn btn-sm btn-primary-outline">{{ 'Unfeature' if course.isFeatured else 'Feature' }}</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="table-no-results">No courses found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

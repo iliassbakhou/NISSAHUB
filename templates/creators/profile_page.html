@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Creator Profile Header -->
+    <section class="creator-profile-header">
+        <img src="{{ creator.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ creator.displayName }}" class="creator-avatar">
+        <div class="creator-info">
+            <h1>{{ creator.displayName or 'NissaHub Creator' }}</h1>
+            <p>{{ creator.bio or 'This creator has not added a bio yet.' }}</p>
+        </div>
+    </section>
+
+    <!-- Storefront Tab Navigation -->
+    <nav class="storefront-nav" id="storefront-nav">
+        <button class="storefront-tab active" data-tab-target="#courses-panel">Courses</button>
+        <button class="storefront-tab" data-tab-target="#products-panel">Products</button>
+    </nav>
+
+    <!-- Tab Content Panels -->
+    <div class="storefront-content">
+
+        <!-- Courses Panel -->
+        <div id="courses-panel" class="storefront-panel active">
+            {% if skills %}
+                <div class="card-grid">
+                    {% for skill in skills %}
+                    <div class="card">
+                        <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
+                            <div class="card-image-wrapper">
+                                <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}" loading="lazy">
+                            </div>
+                        </a>
+                        <div class="card-content">
+                            <h3 class="card-title">{{ skill.name }}</h3>
+                            <p class="card-description">{{ skill.description | truncate(100, True) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-panel-message">
+                    <h3>No Courses Yet</h3>
+                    <p>{{ creator.displayName or 'This creator' }} hasn't published any courses.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Products Panel -->
+        <div id="products-panel" class="storefront-panel">
+            {% if products %}
+                <div class="card-grid">
+                    {% for product in products %}
+                    <div class="card">
+                         <a href="{{ url_for('product_detail_page', product_id=product.id) }}">
+                             <div class="card-image-wrapper" style="aspect-ratio: 1 / 1;">
+                                <img src="{{ product.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ product.name }}" loading="lazy">
+                            </div>
+                        </a>
+                        <div class="card-content">
+                            <h3 class="card-title">{{ product.name }}</h3>
+                            <p class="card-description"></p> {# Added for consistent spacing #}
+                            <div class="card-footer">
+                                 <span class="card-price">{{ "%.2f MAD"|format(product.price|float) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                 <div class="empty-panel-message">
+                    <h3>No Products Yet</h3>
+                    <p>{{ creator.displayName or 'This creator' }} hasn't published any products for sale.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

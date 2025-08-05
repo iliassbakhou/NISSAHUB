@@ -1,0 +1,15 @@
+# Firebase Service Account Key
+nissahub-firebase-service-account.json
+*.json # If you want to ignore ALL .json files from git by default (be careful if you have others you need)
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# IDE / Editor specific
+.vscode/
+# ... other common ignores ...

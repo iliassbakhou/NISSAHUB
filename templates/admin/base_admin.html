@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <h3 class="admin-nav-header">Admin Menu</h3>
+            <a href="{{ url_for('admin_dashboard_page') }}" class="admin-nav-link {% if request.endpoint == 'admin_dashboard_page' %}active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{{ url_for('manage_users_page') }}" class="admin-nav-link {% if request.endpoint == 'manage_users_page' %}active{% endif %}">
+                Manage Users
+            </a>
+            <a href="{{ url_for('manage_courses_page') }}" class="admin-nav-link {% if request.endpoint.startswith('manage_courses') %}active{% endif %}">
+                Manage Courses
+            </a>
+             <a href="#" class="admin-nav-link disabled" title="Coming soon!">
+                Site Settings
+            </a>
+        </nav>
+    </aside>
+    <main class="admin-main-content">
+        <div class="admin-header">
+            <h1>{% block admin_title %}{{ page_title }}{% endblock %}</h1>
+        </div>
+        <div class="admin-content-area">
+             {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block admin_content %}{% endblock %}
+        </div>
+    </main>
+</div>
+{% endblock %}

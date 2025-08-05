@@ -1,0 +1,104 @@
+// static/scss/pages/_marketplace.scss
+@use '../abstracts/variables' as v;
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: v.$color-text-light;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+// Creator Storefront Specific Styles
+.creator-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$spacing-unit;
+    padding: v.$spacing-unit * 2;
+    background-color: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    margin-bottom: 2.5rem;
+    text-align: center;
+
+    @media(min-width: 768px) {
+        flex-direction: row;
+        text-align: left;
+        gap: v.$spacing-unit * 2;
+    }
+}
+
+.creator-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid v.$color-white;
+    box-shadow: 0 0 10px rgba(v.$color-text, 0.15);
+    flex-shrink: 0;
+}
+
+.creator-info h1 {
+    margin-bottom: 0.25rem;
+}
+
+.creator-info p {
+    color: v.$color-text-light;
+    margin-bottom: 0;
+}
+
+// NEW: Storefront Tab Styling
+.storefront-nav {
+    border-bottom: 1px solid v.$color-border;
+    margin-bottom: v.$spacing-unit * 2;
+}
+
+.storefront-tab {
+    background: none;
+    border: none;
+    padding: v.$spacing-unit (v.$spacing-unit * 1.5);
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: v.$color-text-light;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px; // Align bottom border with nav border
+    transition: color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        color: v.$color-text;
+    }
+
+    &.active {
+        color: v.$color-primary;
+        border-bottom-color: v.$color-primary;
+    }
+}
+
+.storefront-panel {
+    display: none; // Hide panels by default
+
+    &.active {
+        display: block; // Show active panel
+    }
+}
+
+.empty-panel-message {
+    text-align: center;
+    padding: (v.$spacing-unit * 4) (v.$spacing-unit * 2);
+    background-color: v.$color-white;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+
+    h3 { margin-bottom: v.$spacing-unit * 0.5; }
+    p { color: v.$color-text-light; }
+}
