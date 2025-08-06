@@ -10,18 +10,23 @@
             <div class="skill-meta">
                 {% if review_summary.count > 0 %}
                 <div class="meta-rating">
-                    <span class="meta-rating-stars">
+                    <div class="star-rating-display" title="{{ review_summary.average }} out of 5 stars">
                         {% for i in range(1, 6) %}
-                            {% if i <= review_summary.average %}★
-                            {% else %}☆
+                            {% set rounded_rating = review_summary.average %}
+                            {% if rounded_rating >= i %}
+                                <span class="star full"></span>
+                            {% elif rounded_rating >= (i - 0.5) %}
+                                <span class="star half"></span>
+                            {% else %}
+                                <span class="star empty"></span>
                             {% endif %}
                         {% endfor %}
-                    </span>
+                    </div>
                     <span>{{ review_summary.average }} ({{ review_summary.count }} review{% if review_summary.count != 1 %}s{% endif %})</span>
                 </div>
                 {% endif %}
-                <span>By: <a href="{{ url_for('creator_profile_page', creator_id=skill.author_id) }}">{{ author.displayName or skill.author_email }}</a></span>
-                <span>Category: <span class="skill-category-badge">{{ skill.category }}</span></span>
+                <span class="meta-author">By: <a href="{{ url_for('creator_profile_page', creator_id=skill.author_id) }}">{{ author.displayName or skill.author_email }}</a></span>
+                <span class="meta-category">Category: <span class="skill-category-badge">{{ skill.category }}</span></span>
             </div>
 
             <div class="skill-image-container">
@@ -36,7 +41,7 @@
             <div class="course-content-section">
                 <h2>Course Content</h2>
                 {% if lessons %}
-                    <ul>
+                    <ul class="lesson-list">
                         {% for lesson in lessons %}
                             <li>{{ lesson.title }}</li>
                         {% endfor %}
@@ -58,43 +63,127 @@
                 <div id="discussion-list" data-skill-id="{{ skill.id }}" data-skill-author-id="{{ skill.author_id }}" data-current-user-id="{{ current_user.uid }}">
                     {% if discussions %}
                         {% for post in discussions %}
-                            {# Discussion threads will be dynamically rendered by JavaScript #}
+                        <div class="discussion-thread" id="thread-{{ post.id }}">
+                            <article class="discussion-post" id="post-{{ post.id }}">
+                                {% set user = post.user_profile %}
+                                {% set profile_url = url_for('creator_profile_page', creator_id=post.user_id) if user.role == 'creator' else url_for('customer_profile_page', user_id=post.user_id) %}
+                                <a href="{{ profile_url }}" class="review-avatar-link">
+                                    <img class="discussion-post-avatar" src="{{ user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ user.displayName }}'s avatar">
+                                </a>
+                                <div class="discussion-post-body">
+                                    <div class="discussion-post-header">
+                                        <a href="{{ profile_url }}" class="review-author-link">
+                                            <span class="discussion-post-author">{{ user.displayName or 'Anonymous' }}</span>
+                                        </a>
+                                        <div class="discussion-meta">
+                                            <span class="discussion-post-date">{{ post.created_at | format_datetime }}</span>
+                                            {% if current_user.uid == post.user_id or current_user.uid == skill.author_id %}
+                                                <button class="delete-post-btn" data-post-id="{{ post.id }}" title="Delete post">🗑️</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="discussion-post-content">
+                                        <p>{{ post.content | nl2br | safe }}</p>
+                                    </div>
+                                    <div class="discussion-post-actions">
+                                        <button class="btn-link reply-btn">Reply</button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <div class="replies-container" id="replies-for-{{ post.id }}">
+                                {% for reply in post.replies %}
+                                <article class="discussion-reply" id="reply-{{ reply.id }}">
+                                    {% set r_user = reply.user_profile %}
+                                    {% set r_profile_url = url_for('creator_profile_page', creator_id=reply.user_id) if r_user.role == 'creator' else url_for('customer_profile_page', user_id=reply.user_id) %}
+                                    <a href="{{ r_profile_url }}" class="review-avatar-link">
+                                        <img class="discussion-post-avatar" src="{{ r_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ r_user.displayName }}'s avatar">
+                                    </a>
+                                    <div class="discussion-post-body">
+                                        <div class="discussion-post-header">
+                                            <a href="{{ r_profile_url }}" class="review-author-link">
+                                                <span class="discussion-post-author">{{ r_user.displayName or 'Anonymous' }}</span>
+                                            </a>
+                                            <div class="discussion-meta">
+                                                <span class="discussion-post-date">{{ reply.created_at | format_datetime }}</span>
+                                                {% if current_user.uid == reply.user_id or current_user.uid == skill.author_id %}
+                                                    <button class="delete-reply-btn" data-post-id="{{ post.id }}" data-reply-id="{{ reply.id }}" title="Delete reply">🗑️</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="discussion-post-content">
+                                            <p>{{ reply.content | nl2br | safe }}</p>
+                                        </div>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                            </div>
+                            <div class="reply-form-container">
+                                <form class="reply-form" data-post-id="{{ post.id }}" style="display: none;">
+                                    <div class="form-group discussion-input-group">
+                                        <img class="current-user-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
+                                        <textarea name="content" placeholder="Write a reply..." rows="2" required></textarea>
+                                        <button type="submit" class="btn btn-primary">Reply</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         {% endfor %}
                     {% else %}
-                        <p id="no-discussions-message">Be the first to start the discussion!</p>
+                        <p id="no-discussions-message" class="empty-state-message">Be the first to start the discussion!</p>
                     {% endif %}
                 </div>
             </div>
 
             <div class="reviews-display-section">
-                <h2>Reviews ({{ review_summary.count }})</h2>
-                <div class="review-list">
+                <h2 id="reviews-heading">Reviews (<span id="review-count-display">{{ review_summary.count }}</span>)</h2>
+                <div class="review-list" id="review-list">
                     {% for review in reviews %}
-                    <article class="review-card">
-                        <img class="review-avatar" src="{{ review.user_profile.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="">
-                        <div>
-                            <span class="review-author-name">{{ review.user_profile.displayName or "Anonymous User" }}</span>
-                            <div class="review-stars">
-                                {% for i in range(review.rating) %}★{% endfor %}
+                    {% if review.user_profile %}
+                    <article class="review-card" id="review-{{ review.id }}">
+                        {% set profile_url = url_for('creator_profile_page', creator_id=review.user_id) if review.user_profile.role == 'creator' else url_for('customer_profile_page', user_id=review.user_id) %}
+                        <a href="{{ profile_url }}" class="review-avatar-link">
+                            <img class="review-avatar" src="{{ review.user_profile.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ review.user_profile.displayName }}">
+                        </a>
+                        <div class="review-content">
+                            <div class="review-header">
+                                <a href="{{ profile_url }}" class="review-author-link">
+                                    <span class="review-author-name">{{ review.user_profile.displayName or "Anonymous User" }}</span>
+                                </a>
+                                <div class="review-meta">
+                                    <div class="star-rating-display" title="{{ review.rating }} out of 5 stars">
+                                        {% for i in range(1, 6) %}
+                                            <span class="star {{ 'full' if i <= review.rating else 'empty' }}"></span>
+                                        {% endfor %}
+                                    </div>
+                                    {# --- START: NEW DELETE BUTTON --- #}
+                                    {% if current_user.uid == review.user_id or current_user.uid == skill.author_id %}
+                                    <button class="delete-review-btn" data-skill-id="{{ skill.id }}" data-review-id="{{ review.id }}" title="Delete review">🗑️</button>
+                                    {% endif %}
+                                    {# --- END: NEW DELETE BUTTON --- #}
+                                </div>
                             </div>
-                            <p>{{ review.text | nl2br | safe }}</p>
+                            <p class="review-text">{{ review.text | nl2br | safe }}</p>
                         </div>
                     </article>
+                    {% endif %}
+                    {% else %}
+                    <p id="no-reviews-message" class="empty-state-message">This course has no reviews yet.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="review-form-section">
                 <h2>Leave a Review</h2>
-                <form method="POST" action="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
+                <form method="POST" action="{{ url_for('submit_review', skill_id=skill.id) }}">
                     <div class="form-group">
                         <label>Your Rating</label>
-                        <div class="star-rating">
-                            <input type="radio" id="star5" name="rating" value="5" required/><label for="star5">★</label>
-                            <input type="radio" id="star4" name="rating" value="4"/><label for="star4">★</label>
-                            <input type="radio" id="star3" name="rating" value="3"/><label for="star3">★</label>
-                            <input type="radio" id="star2" name="rating" value="2"/><label for="star2">★</label>
-                            <input type="radio" id="star1" name="rating" value="1"/><label for="star1">★</label>
+                        <div class="star-rating-form">
+                            <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 star">★</label>
                         </div>
                     </div>
                     <div class="form-group">

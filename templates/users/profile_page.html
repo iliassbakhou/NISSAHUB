@@ -1,54 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page_title }} - NissaHub{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
 <div class="container">
-
-    <!-- Customer Profile Header -->
-    <section class="creator-profile-header"> {# We can reuse the creator header style for consistency #}
-        <img src="{{ profile_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ profile_user.displayName }}" class="creator-avatar">
-        <div class="creator-info">
-            <h1>{{ profile_user.displayName or 'NissaHub User' }}</h1>
-            <p>{{ profile_user.bio or 'This user has not added a bio yet.' }}</p>
+    <!-- Profile Page Header -->
+    <section class="profile-header">
+        <img src="{{ profile_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ profile_user.displayName }}" class="profile-avatar">
+        <div class="profile-info">
+            <h1>{{ profile_user.displayName }}</h1>
+            <p class="profile-role">NissaHub Customer</p>
+            {% if profile_user.bio %}
+                <p class="profile-bio">{{ profile_user.bio }}</p>
+            {% endif %}
         </div>
     </section>
 
-    <!-- Recent Activity Section -->
-    <div class="recent-activity">
-        <h2 class="section-title">Recent Activity</h2>
+    <!-- Activity Feed -->
+    <section class="activity-feed">
+        <h2>Recent Activity</h2>
         
         {% if activity %}
-            <div class="activity-feed">
+            <div class="activity-list">
                 {% for item in activity %}
                     {% if item.type == 'review' %}
-                        <div class="activity-card review-card">
-                            <div class="activity-card-header">
-                                <span class="activity-type">Wrote a review for</span>
-                                <a href="{{ url_for('skill_detail_page', skill_id=item.skill_id) }}" class="activity-link">{{ item.skill.name }}</a>
-                            </div>
-                            <div class="activity-card-body">
-                                <div class="review-stars">
-                                    {% for i in range(1, 6) %}
-                                        <span class="star">{% if i <= item.review.rating %}★{% else %}☆{% endif %}</span>
-                                    {% endfor %}
-                                </div>
-                                <p class="review-text">"{{ item.review.text }}"</p>
-                            </div>
-                            <div class="activity-card-footer">
-                                <small>{{ item.review.created_at.strftime('%B %d, %Y') }}</small>
-                            </div>
+                    <div class="activity-card review-card">
+                        <div class="review-card-header">
+                            <span class="activity-type">Wrote a review for</span>
+                            <a href="{{ url_for('skill_detail_page', skill_id=item.skill_id) }}" class="activity-target-link">{{ item.skill.name }}</a>
                         </div>
+                        <div class="review-card-body">
+                            <p>"{{ item.review.text }}"</p>
+                        </div>
+                        <div class="review-card-footer">
+                            <div class="rating-display">
+                                {% for i in range(1, 6) %}
+                                    <span class="star {{ 'filled' if i <= item.review.rating else '' }}">&#9733;</span>
+                                {% endfor %}
+                            </div>
+                            <span class="activity-timestamp">{{ item.review.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                    </div>
                     {% endif %}
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-panel-message">
                 <h3>No Recent Activity</h3>
-                <p>{{ profile_user.displayName or 'This user' }} hasn't been active recently.</p>
+                <p>{{ profile_user.displayName }} hasn't been active recently.</p>
             </div>
         {% endif %}
-    </div>
-
+    </section>
 </div>
 {% endblock %}

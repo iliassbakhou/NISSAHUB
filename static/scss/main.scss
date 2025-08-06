@@ -10,6 +10,7 @@
 @use 'components/buttons';
 @use 'components/forms';
 @use 'components/card';
+@use 'components/stars'; // New component for star ratings
 
 // 4. Layout: Major structural parts of the site.
 @use 'layout/header';
@@ -21,4 +22,6 @@
 @use 'pages/marketplace';
 @use 'pages/my-creations';
 @use 'pages/skills';
-@use 'pages/admin'; // New import for admin styles
+@use 'pages/skill-detail';
+@use 'pages/admin';
+@use 'pages/profile';

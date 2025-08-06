@@ -58,9 +58,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- START: REVIEW DELETE ---
+    const reviewList = document.getElementById('review-list');
+    if(reviewList) {
+        reviewList.addEventListener('click', function(event) {
+            if(!event.target.matches('.delete-review-btn')) return;
+
+            const button = event.target;
+            const skillId = button.dataset.skillId;
+            const reviewId = button.dataset.reviewId;
+            const reviewCard = document.getElementById(`review-${reviewId}`);
+
+            if(!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+                return;
+            }
+
+            fetch(`/skill/${skillId}/review/${reviewId}`, { method: 'DELETE' })
+                .then(res => res.json().then(data => ({ ok: res.ok, data })))
+                .then(({ ok, data }) => {
+                    if (ok && data.status === 'success') {
+                        reviewCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        reviewCard.style.opacity = '0';
+                        reviewCard.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            reviewCard.remove();
+                            updateReviewCount();
+                        }, 300);
+                    } else {
+                        throw new Error(data.message || 'Failed to delete the review.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Review deletion error:', err);
+                    alert(`An error occurred: ${err.message}`);
+                });
+        });
+    }
+
+    function updateReviewCount() {
+        const reviewCountSpan = document.getElementById('review-count-display');
+        const reviewListContainer = document.getElementById('review-list');
+        const currentCount = reviewListContainer.querySelectorAll('.review-card').length;
+        
+        reviewCountSpan.textContent = currentCount;
+        
+        if (currentCount === 0) {
+            const noReviewsMessage = document.getElementById('no-reviews-message')
+            if (noReviewsMessage) {
+                 noReviewsMessage.style.display = 'block';
+            } else {
+                const p = document.createElement('p');
+                p.id = 'no-reviews-message';
+                p.className = 'empty-state-message';
+                p.textContent = 'This course has no reviews yet.';
+                reviewListContainer.appendChild(p);
+            }
+        }
+    }
+    // --- END: REVIEW DELETE ---
+
     // --- Full Discussion Feature ---
     const discussionList = document.getElementById('discussion-list');
     const discussionForm = document.getElementById('discussion-form');
+    
+    // Check if these elements exist before adding listeners
+    const SKILL_AUTHOR_ID = discussionList?.dataset.skillAuthorId;
+    const CURRENT_USER_ID = discussionList?.dataset.currentUserId;
+    const CURRENT_USER_AVATAR = document.querySelector('.discussion-input-group .discussion-post-avatar')?.src || '/static/img/avatar_placeholder.png';
 
     if (discussionForm) {
         discussionForm.addEventListener('submit', function (event) {
@@ -98,7 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const postId = form.dataset.postId;
             handleFormSubmission(form, `/skill/${discussionList.dataset.skillId}/discussion/${postId}/reply`, (data) => {
                 const repliesContainer = document.getElementById(`replies-for-${postId}`);
-                repliesContainer.appendChild(createReplyElement(data, postId));
+                const newReplyEl = createReplyElement(data, postId)
+                repliesContainer.appendChild(newReplyEl);
+                newReplyEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 form.querySelector('textarea').value = '';
                 form.style.display = 'none';
             });
@@ -145,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     elementToRemove.style.transform = 'translateX(-20px)';
                     setTimeout(() => {
                          elementToRemove.remove();
-                         if (discussionList.children.length === 0) {
+                         if (document.querySelectorAll('.discussion-thread').length === 0) {
                              const p = document.createElement('p');
                              p.id = 'no-discussions-message';
                              p.className = 'empty-state-message';
@@ -160,34 +226,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`An error occurred: ${err.message}`);
             });
     }
-
-    const SKILL_AUTHOR_ID = discussionList?.dataset.skillAuthorId, CURRENT_USER_ID = discussionList?.dataset.currentUserId;
-
+    
     function createThreadElement(data) {
-        const post = data.post, thread = document.createElement('div'), avatar = data.user_profile.avatar_url || '/static/img/avatar_placeholder.png';
+        const post = data.post;
+        const thread = document.createElement('div');
         thread.className = 'discussion-thread';
         thread.id = `thread-${post.id}`;
-        thread.innerHTML = `${createPostElement(data).outerHTML}<div class="replies-container" id="replies-for-${post.id}"></div><div class="reply-form-container"><form class="reply-form" data-post-id="${post.id}" style="display: none;"><div class="form-group discussion-input-group"><img class="current-user-avatar" src="${avatar}" alt="Your avatar"><textarea name="content" placeholder="Write a reply..." rows="2" required></textarea><button type="submit" class="btn btn-primary">Reply</button></div></form></div>`;
+        
+        thread.innerHTML = `
+            ${createPostElement(data).outerHTML}
+            <div class="replies-container" id="replies-for-${post.id}"></div>
+            <div class="reply-form-container">
+                <form class="reply-form" data-post-id="${post.id}" style="display: none;">
+                    <div class="form-group discussion-input-group">
+                        <img class="current-user-avatar" src="${CURRENT_USER_AVATAR}" alt="Your avatar">
+                        <textarea name="content" placeholder="Write a reply..." rows="2" required></textarea>
+                        <button type="submit" class="btn btn-primary">Reply</button>
+                    </div>
+                </form>
+            </div>`;
         return thread;
     }
 
+    function generateUserHTML(user, userId, content, isReply = false, post) {
+        const profileUrl = user.role === 'creator' ? `/creator/${userId}` : `/profile/${userId}`;
+        const canDelete = CURRENT_USER_ID === userId || CURRENT_USER_ID === SKILL_AUTHOR_ID;
+        const date = new Date(content.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const avatar = user.avatar_url || '/static/img/avatar_placeholder.png';
+        const displayName = user.displayName || 'Anonymous User';
+        
+        let deleteButton = '';
+        if (canDelete) {
+            const deleteClass = isReply ? 'delete-reply-btn' : 'delete-post-btn';
+            const postIdAttr = `data-post-id="${isReply ? post.id : content.id}"`;
+            const replyIdAttr = isReply ? `data-reply-id="${content.id}"` : '';
+            deleteButton = `<button class="${deleteClass}" ${postIdAttr} ${replyIdAttr} title="Delete ${isReply ? 'reply' : 'post'}">🗑️</button>`;
+        }
+        
+        const replyAction = !isReply ? `<div class="discussion-post-actions"><button class="btn-link reply-btn">Reply</button></div>` : '';
+
+        return `
+            <a href="${profileUrl}" class="review-avatar-link">
+                <img class="discussion-post-avatar" src="${avatar}" alt="${displayName}'s avatar">
+            </a>
+            <div class="discussion-post-body">
+                <div class="discussion-post-header">
+                    <a href="${profileUrl}" class="review-author-link">
+                        <span class="discussion-post-author">${displayName}</span>
+                    </a>
+                    <div class="discussion-meta">
+                        <span class="discussion-post-date">${date}</span>
+                        ${deleteButton}
+                    </div>
+                </div>
+                <div class="discussion-post-content">
+                    <p>${content.content.replace(/\n/g, '<br>')}</p>
+                </div>
+                ${replyAction}
+            </div>`;
+    }
+
     function createPostElement(data) {
-        const post = data.post, user = data.user_profile, article = document.createElement('article'), canDelete = CURRENT_USER_ID === post.user_id || CURRENT_USER_ID === SKILL_AUTHOR_ID;
-        const date = new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        const avatar = user.avatar_url || '/static/img/avatar_placeholder.png', displayName = user.displayName || 'Anonymous User';
+        const article = document.createElement('article');
         article.className = 'discussion-post';
-        article.id = `post-${post.id}`;
-        article.innerHTML = `<img class="discussion-post-avatar" src="${avatar}" alt="${displayName}'s avatar"><div class="discussion-post-body"><div class="discussion-post-header"><span class="discussion-post-author">${displayName}</span><div class="discussion-meta"><span class="discussion-post-date">${date}</span>${canDelete ? `<button class="delete-post-btn" data-post-id="${post.id}" title="Delete post">🗑️</button>` : ''}</div></div><div class="discussion-post-content"><p>${post.content.replace(/\n/g, '<br>')}</p></div><div class="discussion-post-actions"><button class="btn-link reply-btn">Reply</button></div></div>`;
+        article.id = `post-${data.post.id}`;
+        article.innerHTML = generateUserHTML(data.user_profile, data.post.user_id, data.post, false);
         return article;
     }
 
     function createReplyElement(data, postId) {
-        const reply = data.reply, user = data.user_profile, article = document.createElement('article'), canDelete = CURRENT_USER_ID === reply.user_id || CURRENT_USER_ID === SKILL_AUTHOR_ID;
-        const date = new Date(reply.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        const avatar = user.avatar_url || '/static/img/avatar_placeholder.png', displayName = user.displayName || 'Anonymous User';
+        const article = document.createElement('article');
         article.className = 'discussion-reply';
-        article.id = `reply-${reply.id}`;
-        article.innerHTML = `<img class="discussion-post-avatar" src="${avatar}" alt="${displayName}'s avatar"><div class="discussion-post-body"><div class="discussion-post-header"><span class="discussion-post-author">${displayName}</span><div class="discussion-meta"><span class="discussion-post-date">${date}</span>${canDelete ? `<button class="delete-reply-btn" data-post-id="${postId}" data-reply-id="${reply.id}" title="Delete reply">🗑️</button>` : ''}</div></div><div class="discussion-post-content"><p>${reply.content.replace(/\n/g, '<br>')}</p></div></div>`;
+        article.id = `reply-${data.reply.id}`;
+        const post = { id: postId };
+        article.innerHTML = generateUserHTML(data.user_profile, data.reply.user_id, data.reply, true, post);
         return article;
     }
 });

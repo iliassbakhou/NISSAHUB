@@ -1,0 +1,38 @@
+// static/scss/components/_stars.scss
+@use '../abstracts/variables' as v;
+
+.star-rating-display {
+    display: inline-flex;
+    font-size: 1.2rem; // Defines the size of the stars
+    line-height: 1;
+
+    .star {
+        display: inline-block;
+        font-style: normal;
+        position: relative;
+        // Use a unicode character for the star
+        &::before {
+            content: '★';
+        }
+    }
+    
+    // Default star color (empty)
+    .star {
+        color: v.$color-border;
+    }
+    
+    // Filled star color
+    .star.full {
+        color: #ffc107;
+    }
+    
+    // Half star: achieved with a linear gradient clipping
+    .star.half {
+        background: linear-gradient(90deg, #ffc107 50%, v.$color-border 50%);
+        // THE FIX: Add the standard property for full compatibility
+        -webkit-background-clip: text;
+        background-clip: text; 
+        -webkit-text-fill-color: transparent;
+        color: transparent; // Hides original character color to let gradient show
+    }
+}

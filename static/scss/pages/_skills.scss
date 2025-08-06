@@ -1,21 +1,28 @@
 // static/scss/pages/_skills.scss
 @use '../abstracts/variables' as v;
-@use 'sass:color';
 
-.skill-detail-container {
-    display: grid;
-    gap: v.$spacing-unit * 2;
-    grid-template-columns: 1fr;
-
-    @media(min-width: 1024px){
-        grid-template-columns: 2.5fr 1fr;
-    }
-}
-
-.skill-detail-main,
-.skill-detail-sidebar .sidebar-card {
-    background-color: v.$color-white;
-    padding: v.$spacing-unit * 1.5;
+// Styles for the main /skills page (course listing)
+// and other pages that use this generic header style.
+.page-header-section {
+    padding: (v.$spacing-unit * 3) (v.$spacing-unit * 1.5);
+    margin-bottom: (v.$spacing-unit * 2.5);
     border-radius: v.$border-radius;
+    text-align: center;
+    background-color: v.$color-white;
     border: 1px solid v.$color-border;
+
+    .page-header-content {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        margin-bottom: v.$spacing-unit * 0.75;
+    }
+
+    p {
+        font-size: 1.15rem;
+        color: v.$color-text-light;
+        line-height: 1.7;
+    }
 }

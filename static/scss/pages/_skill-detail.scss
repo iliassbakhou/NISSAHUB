@@ -1,0 +1,147 @@
+// static/scss/pages/_skill-detail.scss
+@use '../abstracts/variables' as v;
+
+.skill-detail-container {
+    display: grid;
+    gap: v.$spacing-unit * 2.5;
+    grid-template-columns: 1fr;
+
+    @media(min-width: 1024px) {
+        grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr);
+    }
+}
+
+.skill-detail-main,
+.skill-detail-sidebar .sidebar-card {
+    background-color: v.$color-white;
+    padding: v.$spacing-unit * 2;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+}
+
+.skill-detail-main {
+    h2 {
+        font-size: 1.6rem;
+        margin-bottom: v.$spacing-unit * 1.5;
+        padding-bottom: v.$spacing-unit;
+        border-bottom: 1px solid v.$color-border;
+    }
+}
+
+.skill-title {
+    margin-bottom: v.$spacing-unit;
+}
+
+.skill-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-unit * 1.5;
+    font-size: 0.95rem;
+    color: v.$color-text-light;
+    margin-bottom: v.$spacing-unit * 1.5;
+}
+
+.skill-category-badge {
+    background-color: v.$color-bg-light;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 500;
+    color: v.$color-text;
+}
+
+.skill-image-container {
+    border-radius: v.$border-radius;
+    overflow: hidden;
+    margin-bottom: v.$spacing-unit * 2;
+    aspect-ratio: 16 / 9;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.discussion-input-group {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$spacing-unit;
+}
+
+.discussion-post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+// Review Section Styles
+.review-card {
+    display: flex;
+    gap: v.$spacing-unit * 1.5;
+    padding: v.$spacing-unit * 1.5 0;
+    border-bottom: 1px solid v.$color-border;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.review-avatar-link {
+    flex-shrink: 0;
+}
+
+.review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.review-content {
+    .star-rating-display {
+        margin-bottom: v.$spacing-unit * 0.75;
+    }
+}
+
+.review-author-link {
+    text-decoration: none;
+    &:hover .review-author-name {
+        text-decoration: underline;
+        color: v.$color-primary-dark;
+    }
+}
+
+.review-author-name {
+    font-weight: 700;
+    color: v.$color-primary-dark;
+}
+
+.review-text {
+    line-height: 1.7;
+    color: v.$color-text;
+    margin: 0;
+}
+
+// Star Rating INPUT Form
+.star-rating-form {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    
+    input { display: none; }
+
+    label {
+        font-size: 2rem;
+        color: v.$color-border;
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 0 0.1em;
+    }
+    
+    input:checked ~ label,
+    label:hover,
+    label:hover ~ label {
+        color: #ffc107;
+    }
+}

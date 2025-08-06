@@ -1,0 +1,120 @@
+// static/scss/pages/_profile.scss
+@use '../abstracts/variables' as v;
+@use 'sass:color';
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$spacing-unit * 1.5;
+    padding: v.$spacing-unit * 2;
+    background-color: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    margin-bottom: 2.5rem;
+    text-align: center;
+
+    @media(min-width: 768px) {
+        flex-direction: row;
+        text-align: left;
+        gap: v.$spacing-unit * 2.5;
+        padding: v.$spacing-unit * 2.5;
+    }
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid v.$color-white;
+    box-shadow: 0 0 15px rgba(v.$color-text, 0.2);
+    flex-shrink: 0;
+}
+
+.profile-info {
+    h1 {
+        margin-bottom: v.$spacing-unit * 0.25;
+        font-size: 2.2rem;
+    }
+    .profile-role {
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: v.$color-primary;
+        letter-spacing: 1px;
+        margin-bottom: v.$spacing-unit;
+    }
+    .profile-bio {
+        color: v.$color-text-light;
+        margin-bottom: 0;
+        max-width: 60ch;
+        line-height: 1.7;
+    }
+}
+
+.activity-feed {
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: v.$spacing-unit * 1.5;
+        padding-bottom: v.$spacing-unit;
+        border-bottom: 1px solid v.$color-border;
+    }
+}
+
+.activity-list {
+    display: grid;
+    gap: v.$spacing-unit * 1.5;
+}
+
+.activity-card {
+    background-color: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    padding: v.$spacing-unit * 1.5;
+}
+
+.review-card-header {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-unit * 0.5;
+    margin-bottom: v.$spacing-unit;
+    flex-wrap: wrap;
+
+    .activity-type {
+        color: v.$color-text-light;
+        font-size: 0.95rem;
+    }
+    .activity-target-link {
+        font-weight: 700;
+        color: v.$color-primary-dark;
+    }
+}
+
+.review-card-body p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: v.$color-text;
+    line-height: 1.6;
+    margin-bottom: v.$spacing-unit;
+    padding-left: v.$spacing-unit;
+    border-left: 3px solid v.$color-border;
+}
+
+.review-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: v.$color-text-light;
+    font-size: 0.9rem;
+}
+
+.rating-display {
+    .star {
+        font-size: 1.25rem;
+        color: v.$color-border;
+        &.filled {
+            color: #ffc107;
+        }
+    }
+}
