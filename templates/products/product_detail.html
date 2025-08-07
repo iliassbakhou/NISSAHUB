@@ -3,110 +3,6 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-<style>
-    /* Temporary styles for Product Detail Page */
-    .product-detail-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 3rem;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-    .product-image-section {
-        flex: 1 1 400px; /* Flex-grow, flex-shrink, flex-basis */
-        min-width: 300px;
-    }
-    .product-image-section img {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 1/1;
-        object-fit: cover;
-        border-radius: 12px;
-        border: 1px solid #eee;
-    }
-    .product-info-section {
-        flex: 2 1 500px; /* Grow twice as fast as image */
-        display: flex;
-        flex-direction: column;
-    }
-    .product-category {
-        font-size: 0.9rem;
-        color: #666;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-    .product-name {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        line-height: 1.2;
-    }
-    .product-price {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: var(--primary-color, #4A154B);
-        margin-bottom: 1.5rem;
-    }
-    .product-description {
-        font-size: 1rem;
-        line-height: 1.7;
-        color: #333;
-        margin-bottom: 2rem;
-    }
-    .buy-button {
-        padding: 0.8rem 1.5rem;
-        font-size: 1.1rem;
-        background-color: var(--primary-color, #4A154B);
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        text-align: center;
-        align-self: flex-start; /* Don't stretch button */
-    }
-    .buy-button:hover {
-        background-color: #361036;
-    }
-
-    .creator-card {
-        margin-top: 3rem;
-        padding: 1.5rem;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        border: 1px solid #e5e5e5;
-    }
-    .creator-card h3 {
-        margin-top: 0;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 0.75rem;
-    }
-    .creator-info-link {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        text-decoration: none;
-        color: inherit;
-    }
-    .creator-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    .creator-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-    }
-    .creator-bio {
-        margin-top: 1rem;
-        color: #555;
-        font-size: 0.95rem;
-    }
-
-</style>
-
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -119,24 +15,25 @@
     <div class="product-detail-container">
         <!-- Product Image Section -->
         <div class="product-image-section">
-            {% if product.image_url and 'cloudinary' in product.image_url %}
-                <img src="{{ product.image_url.replace('/upload/', '/upload/w_1000,h_1000,c_limit/') }}" alt="Image for {{ product.name }}">
-            {% else %}
-                <img src="{{ url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="Placeholder for {{ product.name }}">
-            {% endif %}
+             <img src="{{ product.image_url | transform_cloudinary('card') }}" alt="Image for {{ product.name }}">
         </div>
 
         <!-- Product Info Section -->
         <div class="product-info-section">
             <span class="product-category">{{ product.category }}</span>
             <h1 class="product-name">{{ product.name }}</h1>
-            <p class="product-price">{{ "%.2f MAD"|format(product.price) }}</p>
+            <p class="product-price">Dhs {{ "%.2f"|format(product.price) }}</p>
             <div class="product-description">
-                {{ product.description | nl2br }}
+                {{ product.description | nl2br | safe }}
             </div>
 
-            <!-- Placeholder for future functionality -->
-            <button class="buy-button">Add to Cart</button>
+            <button class="btn btn-primary btn-lg" id="add-to-cart-btn" 
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}"
+                    data-product-price="{{ product.price }}"
+                    data-product-image="{{ product.image_url | transform_cloudinary('card') }}">
+                Add to Cart
+            </button>
 
             <!-- Creator Information -->
             {% if author %}
@@ -151,7 +48,6 @@
                 {% endif %}
             </div>
             {% endif %}
-
         </div>
     </div>
 </div>

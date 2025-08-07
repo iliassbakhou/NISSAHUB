@@ -1,147 +1,213 @@
-// static/scss/pages/_skill-detail.scss
 @use '../abstracts/variables' as v;
+@use 'sass:color';
 
 .skill-detail-container {
     display: grid;
-    gap: v.$spacing-unit * 2.5;
     grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 
-    @media(min-width: 1024px) {
-        grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr);
+    @media (min-width: 992px) {
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
     }
-}
-
-.skill-detail-main,
-.skill-detail-sidebar .sidebar-card {
-    background-color: v.$color-white;
-    padding: v.$spacing-unit * 2;
-    border-radius: v.$border-radius;
-    border: 1px solid v.$color-border;
 }
 
 .skill-detail-main {
-    h2 {
-        font-size: 1.6rem;
-        margin-bottom: v.$spacing-unit * 1.5;
-        padding-bottom: v.$spacing-unit;
-        border-bottom: 1px solid v.$color-border;
+    .skill-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
     }
-}
 
-.skill-title {
-    margin-bottom: v.$spacing-unit;
-}
+    .skill-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1.5rem;
+        margin-bottom: 2rem;
+        color: v.$color-text-light;
+        font-size: 0.95rem;
 
-.skill-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: v.$spacing-unit * 1.5;
-    font-size: 0.95rem;
-    color: v.$color-text-light;
-    margin-bottom: v.$spacing-unit * 1.5;
-}
-
-.skill-category-badge {
-    background-color: v.$color-bg-light;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-weight: 500;
-    color: v.$color-text;
+        .meta-rating { display: flex; align-items: center; gap: 0.5rem; }
+        .skill-category-badge {
+            background-color: color.adjust(v.$color-primary, $alpha: -0.9);
+            color: v.$color-primary;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    }
 }
 
 .skill-image-container {
-    border-radius: v.$border-radius;
-    overflow: hidden;
-    margin-bottom: v.$spacing-unit * 2;
-    aspect-ratio: 16 / 9;
-
+    margin-bottom: 2.5rem;
     img {
         width: 100%;
-        height: 100%;
+        aspect-ratio: 16 / 9;
         object-fit: cover;
+        border-radius: v.$border-radius;
+        box-shadow: v.$box-shadow;
     }
 }
 
-.discussion-input-group {
-    display: flex;
-    align-items: flex-start;
-    gap: v.$spacing-unit;
+.skill-content-card {
+    background-color: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid v.$color-border;
+        font-size: 1.6rem;
+    }
 }
 
-.discussion-post-avatar {
+.lesson-list {
+    list-style: none;
+    padding-left: 0;
+    li {
+        padding: 0.75rem 0 0.75rem 2rem;
+        position: relative;
+        font-size: 1.1rem;
+        border-bottom: 1px solid v.$color-bg-light;
+        &:last-child { border-bottom: none; }
+        &::before {
+            content: '✓';
+            color: v.$color-primary;
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+            font-weight: bold;
+        }
+    }
+}
+
+// --- START: DEFINITIVE FIX FOR DISCUSSION & REVIEWS ---
+.discussion-input-group, .reply-form .form-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.discussion-post-avatar, .current-user-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    object-fit: cover;
     flex-shrink: 0;
 }
 
-// Review Section Styles
-.review-card {
+.discussion-post, .discussion-reply {
     display: flex;
-    gap: v.$spacing-unit * 1.5;
-    padding: v.$spacing-unit * 1.5 0;
+    gap: 1rem;
+    padding: 1.5rem 0;
     border-bottom: 1px solid v.$color-border;
+}
+
+.discussion-thread > .discussion-post {
+    border-bottom: none;
+    padding-bottom: 1rem;
+}
+.discussion-thread:not(:last-child) {
+    border-bottom: 1px solid v.$color-border;
+}
+
+.replies-container {
+    padding-left: 50px; // Indent replies
+    border-left: 2px solid v.$color-bg-light;
+    margin-left: 20px;
     
-    &:last-child {
-        border-bottom: none;
+    .discussion-reply {
+        padding: 1rem 0;
+        &:last-child { border-bottom: none; }
     }
 }
-
-.review-avatar-link {
-    flex-shrink: 0;
+.reply-form-container {
+     padding-left: 70px; // Indent reply form
+     padding-top: 1rem;
 }
 
-.review-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-}
-
-.review-content {
-    .star-rating-display {
-        margin-bottom: v.$spacing-unit * 0.75;
-    }
-}
-
-.review-author-link {
-    text-decoration: none;
-    &:hover .review-author-name {
-        text-decoration: underline;
-        color: v.$color-primary-dark;
-    }
-}
-
-.review-author-name {
-    font-weight: 700;
-    color: v.$color-primary-dark;
-}
-
-.review-text {
-    line-height: 1.7;
-    color: v.$color-text;
-    margin: 0;
-}
-
-// Star Rating INPUT Form
-.star-rating-form {
+.discussion-post-body { flex-grow: 1; }
+.discussion-post-header, .review-header {
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    
-    input { display: none; }
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
 
-    label {
-        font-size: 2rem;
-        color: v.$color-border;
-        cursor: pointer;
-        transition: color 0.2s;
-        padding: 0 0.1em;
+.discussion-post-author, .review-author-name {
+    font-weight: 600;
+    color: v.$color-text-dark;
+}
+.review-author-link, .discussion-post-header a {
+    text-decoration: none;
+    &:hover { .discussion-post-author, .review-author-name { color: v.$color-primary; }}
+}
+
+.discussion-meta, .review-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: v.$color-text-light;
+}
+
+.delete-post-btn, .delete-reply-btn, .delete-review-btn {
+    background: none; border: none; cursor: pointer; color: v.$color-text-light;
+    opacity: 0.5; transition: opacity 0.2s;
+    &:hover { opacity: 1; color: v.$color-danger; }
+}
+
+.discussion-post-content, .review-text {
+    p { margin-bottom: 0; }
+}
+
+.review-list {
+    .review-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid v.$color-border;
+        &:last-child { border-bottom: none; }
     }
-    
-    input:checked ~ label,
-    label:hover,
-    label:hover ~ label {
-        color: #ffc107;
+    .review-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .review-content { flex: 1; }
+}
+// --- END: DEFINITIVE FIX ---
+
+.skill-detail-sidebar {
+    position: sticky;
+    top: v.$spacing-unit * 2;
+    align-self: start;
+
+    .sidebar-card {
+        background: v.$color-white;
+        border: 1px solid v.$color-border;
+        border-radius: v.$border-radius;
+        box-shadow: v.$box-shadow;
+        padding: 2rem;
+        text-align: center;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: v.$color-text-light;
+            margin-bottom: 1.5rem;
+        }
     }
 }

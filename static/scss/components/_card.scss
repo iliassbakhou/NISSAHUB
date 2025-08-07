@@ -1,112 +1,88 @@
-// static/scss/components/_card.scss
 @use '../abstracts/variables' as v;
 
 .card {
-    height: 100%;
-    background-color: v.$color-white;
-    border: 1px solid v.$color-border;
-    border-radius: v.$border-radius;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(v.$color-text, 0.05);
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background-color: v.$color-white;
+  border-radius: v.$border-radius;
+  box-shadow: v.$box-shadow;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
-    a {
-        text-decoration: none;
-        color: inherit;
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
 
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 12px rgba(v.$color-text, 0.1);
-
-        .card-image-wrapper img {
-            transform: scale(1.05);
-        }
-    }
-}
-
-.card-image-wrapper {
-    display: block;
+  &-image-container {
+    position: relative;
     width: 100%;
-    aspect-ratio: 16 / 10;
-    overflow: hidden;
+    aspect-ratio: 4 / 3; 
     background-color: v.$color-bg-light;
+  }
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-}
+  &-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    display: block;
+  }
 
-.card-content {
-    padding: v.$spacing-unit * 1.25;
+  &-price-tag {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: v.$color-white;
+    padding: 0.25rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  &-body {
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-}
+  }
 
-.card-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: v.$color-primary-dark;
-    margin: 0 0 v.$spacing-unit 0;
-    line-height: 1.4;
-}
+  &-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: v.$color-text-dark;
+  }
 
-.card-description {
-    font-size: 0.95rem;
+  &-category, &-author-name {
     color: v.$color-text-light;
-    margin-bottom: v.$spacing-unit;
-    flex-grow: 1;
-}
+    font-size: 0.9rem;
+    margin: 0;
+  }
 
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+  &-author-info {
     margin-top: auto;
-    padding-top: v.$spacing-unit;
-    border-top: 1px solid v.$color-border;
-    gap: v.$spacing-unit;
-}
-
-.card-author-link {
+    padding-top: 1rem; 
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: v.$color-text-light;
-    overflow: hidden; // Prevents long names from breaking layout
-    
-    &:hover {
-        text-decoration: none;
-        color: v.$color-primary;
-    }
+    gap: 0.5rem;
+    color: v.$color-text;
+    font-size: 0.9rem;
+  }
 
-    .author-avatar-small {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    span {
-        font-weight: 500;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+  &-author-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid v.$color-border;
+  }
 }
 
-.card-price {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: v.$color-primary;
-    flex-shrink: 0;
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block; 
 }

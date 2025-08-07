@@ -1,44 +1,76 @@
-// static/scss/components/_buttons.scss
 @use '../abstracts/variables' as v;
 @use 'sass:color';
 
-.btn {
-    display: inline-block;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: v.$font-size-base;
-    font-family: v.$font-primary;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+.btn, .btn-primary, .btn-secondary, .btn-danger {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: v.$border-radius;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
 
-    &:hover {
-        text-decoration: none;
-        transform: translateY(-2px);
-    }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .btn-primary {
-    background-color: v.$color-primary;
-    color: v.$color-white;
-
-    &:hover {
-        background-color: color.adjust(v.$color-primary, $lightness: -5%, $saturation: 5%);
-        color: v.$color-white;
-    }
+  background-color: v.$color-primary;
+  color: v.$color-white;
+  &:hover:not(:disabled) {
+    background-color: v.$color-primary-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .btn-primary-sm {
-    @extend .btn;
-    @extend .btn-primary;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+  @extend .btn-primary;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn-secondary {
+  background-color: v.$color-grey-light;
+  color: v.$color-text;
+  &:hover:not(:disabled) {
+    background-color: v.$color-grey-medium;
+  }
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.15rem;
 }
 
 .btn-block {
     display: block;
     width: 100%;
+}
+
+.btn-danger {
+  background-color: v.$color-danger;
+  color: v.$color-white;
+   &:hover:not(:disabled) {
+    background-color: color.adjust(v.$color-danger, $lightness: -8%);
+  }
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: v.$color-text-light;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    &:hover {
+        color: v.$color-primary;
+        text-decoration: underline;
+    }
 }

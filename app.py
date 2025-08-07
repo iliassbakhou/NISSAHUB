@@ -46,6 +46,27 @@ def format_datetime(timestamp):
         return timestamp.strftime('%b %d, %Y')
     return timestamp # Fallback for unexpected types
 
+# --- START: NEW HIGH-VALUE IMAGE TRANSFORMER ---
+@app.template_filter('transform_cloudinary')
+def transform_cloudinary_url(url, type='card'):
+    if not url or 'res.cloudinary.com' not in url:
+        return url_for('static', filename='img/skill_placeholder_default.jpg')
+    
+    # Transformation for standard cards (4:3 aspect ratio, smart crop)
+    if type == 'card':
+        transformation = "w_400,h_300,c_fill,g_auto"
+    else: # Fallback for unknown types or future additions
+        return url
+
+    # Insert the transformation string into the URL
+    if '/upload/' in url:
+        parts = url.split('/upload/')
+        return f"{parts[0]}/upload/{transformation}/{parts[1]}"
+    
+    return url
+# --- END: NEW HIGH-VALUE IMAGE TRANSFORMER ---
+
+
 @app.context_processor
 def inject_user_data():
     if 'user_id' in session:
@@ -112,14 +133,35 @@ def generate_search_tokens(text):
 @app.route('/')
 @login_required
 def home():
-    featured_skills, recent_skills = [], []
+    featured_skills, recent_skills, recent_products = [], [], []
+    users_cache = {}
     try:
+        # Fetch featured skills
         featured_query = db.collection('skills').where(filter=firestore.FieldFilter('isPublished', '==', True)).where(filter=firestore.FieldFilter('isFeatured', '==', True)).order_by('created_at', direction=firestore.Query.DESCENDING).limit(6)
         featured_skills = [{'id': doc.id, **doc.to_dict()} for doc in featured_query.stream()]
+        
+        # Fetch recent skills
         recent_query = db.collection('skills').where(filter=firestore.FieldFilter('isPublished', '==', True)).where(filter=firestore.FieldFilter('isFeatured', '==', False)).order_by('created_at', direction=firestore.Query.DESCENDING).limit(6)
         recent_skills = [{'id': doc.id, **doc.to_dict()} for doc in recent_query.stream()]
-    except Exception: flash("Could not load courses. An admin may need to configure database indexes.", "error"); traceback.print_exc()
-    return render_template('index.html', featured_skills=featured_skills, recent_skills=recent_skills)
+        
+        # --- START: NEW PRODUCTS LOGIC ---
+        # Fetch recent products
+        products_query = db.collection('products').where(filter=firestore.FieldFilter('isPublished', '==', True)).order_by('created_at', direction=firestore.Query.DESCENDING).limit(6)
+        for doc in products_query.stream():
+            product_data = {'id': doc.id, **doc.to_dict()}
+            author_id = product_data.get('author_id')
+            if author_id and author_id not in users_cache:
+                author_doc = db.collection('users').document(author_id).get()
+                users_cache[author_id] = author_doc.to_dict() if author_doc.exists else {}
+            product_data['author'] = users_cache.get(author_id, {}) # Attach author data to product
+            recent_products.append(product_data)
+        # --- END: NEW PRODUCTS LOGIC ---
+
+    except Exception:
+        flash("Could not load all homepage content. An admin may need to configure database indexes.", "error")
+        traceback.print_exc()
+
+    return render_template('index.html', featured_skills=featured_skills, recent_skills=recent_skills, recent_products=recent_products)
 
 @app.route('/admin/dashboard')
 @admin_required
@@ -254,7 +296,6 @@ def skill_detail_page(skill_id):
         author_data = db.collection('users').document(skill_data.get('author_id')).get().to_dict() or {}
         lessons_list = sorted([{'id': doc.id, **doc.to_dict()} for doc in skill_ref.collection('lessons').stream()], key=lambda l: l.get('order', 0))
         
-        # --- Robustly fetch and sort reviews ---
         temp_reviews_list = []
         total_rating = 0
         user_cache = {}
@@ -327,7 +368,6 @@ def submit_review(skill_id):
     except Exception: flash("An error submitting your review.", "error"); traceback.print_exc()
     return redirect(url_for('skill_detail_page', skill_id=skill_id))
 
-# --- START: NEW FUNCTION ---
 @app.route('/skill/<string:skill_id>/review/<string:review_id>', methods=['DELETE'])
 @login_required
 def delete_review(skill_id, review_id):
@@ -346,7 +386,6 @@ def delete_review(skill_id, review_id):
         review_data = review_doc.to_dict()
         skill_data = skill_doc.to_dict()
 
-        # Security Check: User must be the author of the review or the author of the skill
         if current_user_id == review_data.get('user_id') or current_user_id == skill_data.get('author_id'):
             review_ref.delete()
             return jsonify({'status': 'success', 'message': 'Review deleted successfully.'}), 200
@@ -356,7 +395,6 @@ def delete_review(skill_id, review_id):
     except Exception as e:
         traceback.print_exc()
         return jsonify({'status': 'error', 'message': 'An internal error occurred.'}), 500
-# --- END: NEW FUNCTION ---
     
 @app.route('/skill/<string:skill_id>/discussion', methods=['POST'])
 @login_required
@@ -403,7 +441,6 @@ def create_discussion_reply(skill_id, post_id):
 def delete_discussion_post(skill_id, post_id):
     try:
         post_ref = db.collection('skills').document(skill_id).collection('discussions').document(post_id)
-        # Professional Delete: Must also delete all sub-collections (replies)
         replies = post_ref.collection('replies').stream()
         for reply in replies: reply.reference.delete()
         post_ref.delete()
@@ -418,10 +455,6 @@ def delete_discussion_reply(skill_id, post_id, reply_id):
         return jsonify({'status': 'success', 'message': 'Reply deleted.'})
     except Exception: return jsonify({'status': 'error', 'message': 'Failed to delete reply.'}), 500
 
-# ... (The rest of app.py is unchanged and can be omitted for brevity)
-# Keep the full file from your end, I am just showing the changed parts here
-# But for you, it is still a full copy-paste
-# (all functions from creator_profile_page to the end are the same)
 @app.route('/creator/<string:creator_id>')
 @login_required
 def creator_profile_page(creator_id):

@@ -1,0 +1,27 @@
+// in static/scss/pages/_homepage.scss
+
+.card.card-product {
+  // Fixes the layout for the author info block (avatar + name)
+  .card-author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    color: #555;
+    font-size: 0.9rem;
+  }
+
+  // Styles the author avatar to be a small circle
+  .card-author-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+
+  // Ensures the image container can position the price tag correctly
+  .card-image-container {
+    position: relative;
+  }
+}

@@ -1,10 +1,24 @@
-// static/scss/layout/_footer.scss
 @use '../abstracts/variables' as v;
 
 .main-footer {
-    padding: (v.$spacing-unit * 2) v.$spacing-unit;
+    background-color: v.$color-bg-dark;
+    color: v.$color-text-inverse;
+    padding: 2rem v.$spacing-unit;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    max-width: v.$container-max-width;
+    margin: 0 auto;
     text-align: center;
-    margin-top: auto; // Critical for sticky footer
-    background-color: v.$color-text;
-    color: v.$color-bg-light;
+
+    a {
+        color: v.$color-text-inverse;
+        text-decoration: none;
+        margin: 0 0.5rem;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }

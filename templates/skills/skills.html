@@ -1,46 +1,49 @@
-<!-- templates/skills/skills.html -->
 {% extends "base.html" %}
 
-{% block title %}Explore Courses{% endblock %}
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
 
 {% block content %}
-<div class="skills-page-wrapper">
-    <section class="page-header page-header-section">
-        <div class="container">
-            <h1>Explore Courses</h1>
-            <p>Discover a variety of skills offered by talented women in our community.</p>
+<div class="container">
+    <div class="page-header">
+        <h1>Explore Courses</h1>
+        <p>Learn a new skill from an amazing community of creators.</p>
+    </div>
+    
+    <form class="skills-filter-form" method="GET" action="{{ url_for('skills_page') }}">
+        <div class="form-group">
+            <input type="search" name="query" placeholder="Search for a skill..." value="{{ search_query or '' }}">
         </div>
-    </section>
-
-    <!-- Search and Filter sections would go here -->
-
-    <section class="skills-list-section">
-        <div class="container">
-            {% if skills %}
-                <div class="card-grid">
-                    {% for skill in skills %}
-                    <div class="card">
-                        <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
-                            <div class="card-image-wrapper">
-                                <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="Cover image for {{ skill.name }}">
-                            </div>
-                        </a>
-                        <div class="card-content">
-                            <h3 class="card-title">{{ skill.name }}</h3>
-                            <p class="card-description">{{ skill.description | truncate(100, true) }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-results-message">
-                    <h2>No courses have been added yet.</h2>
-                    {% if current_user.role == 'creator' %}
-                        <p>Why not be the first? <a href="{{ url_for('create_skill_page') }}" class="btn btn-primary" style="display:inline-block; margin-top: 1rem;">Create a Course</a></p>
-                    {% endif %}
-                </div>
-            {% endif %}
+        <div class="form-group">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+                {% endfor %}
+            </select>
         </div>
-    </section>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    {% if skills %}
+    <div class="card-grid">
+        {% for skill in skills %}
+        <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}" class="card-link">
+            <article class="card card-skill">
+                <div class="card-image-container">
+                    <img src="{{ skill.image_url | transform_cloudinary }}" alt="{{ skill.name }}" class="card-image">
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">{{ skill.name }}</h3>
+                    <p class="card-category">{{ skill.category }}</p>
+                </div>
+            </article>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-message">
+        <p>No courses found matching your criteria. Try a different search!</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

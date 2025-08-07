@@ -1,131 +1,53 @@
-# compile_scss.py (Simplified attempt)
-import sass
+# compile_scss.py
+import subprocess
 import time
 import os
+import sys
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Configuration
 SCSS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'scss')
 CSS_DIR = os.path.join(os.path.dirname(__file__), 'static', 'css')
 MAIN_SCSS_FILE = os.path.join(SCSS_DIR, 'main.scss')
 OUTPUT_CSS_FILE = os.path.join(CSS_DIR, 'main.css')
-# We'll let libsass decide on the map file name if it generates one based on CSS output path
-OUTPUT_MAP_FILE_EXPECTED = OUTPUT_CSS_FILE + ".map"
 
+os.makedirs(CSS_DIR, exist_ok=True)
 
-# Ensure CSS directory exists
-if not os.path.exists(CSS_DIR):
-    os.makedirs(CSS_DIR)
-
-def compile_scss(event_path=None):
-    """Compiles the main SCSS file to CSS."""
+def compile_scss_with_cli(event_path=None):
     if event_path:
-        if not event_path.endswith('.scss') and event_path != "initial_compile":
-            return
-        print(f"Change detected in {event_path}, recompiling SCSS...")
+        print(f"Change detected in '{os.path.basename(event_path)}'. Recompiling...")
     else:
-        print("Compiling SCSS...")
-
+        print("Initial SCSS compilation...")
+    command = [ "sass", f"{MAIN_SCSS_FILE}:{OUTPUT_CSS_FILE}", "--style=expanded", "--source-map" ]
     try:
-        # Try compiling with fewer explicit sourcemap args,
-        # hoping libsass generates a map by convention or an internal default.
-        # The key for libsass is often just `source_map=True` and giving it file paths.
-        # Or even just `sass.compile(filename=INPUT, output_filename=OUTPUT)`
-        #
-        # For the `sass` PyPI package, the docs usually show something like:
-        # `css_text, map_text = sass.compile(filename=..., source_map=True)`
-        # OR providing `source_map_root` or `source_map_path` for external maps.
-
-        # Let's try what the library often expects for external maps:
-        compiled_css_result = sass.compile(
-            filename=MAIN_SCSS_FILE,
-            output_style='expanded',
-            # Forcing an output path for map via a separate parameter,
-            # different from `source_map_filename`
-            source_map_contents=True, # Include original sources in map, good for debugging
-            source_map_embed=False,   # We want an external map file
-            # The 'sass' PyPI package usually names the map parameter 'source_map_filename'
-            # if that's what's failing, it means this package might not even have that exact name
-            # OR 'source_map' is not a direct argument but rather implicit if you ask for map text.
-
-            # Simplest for separate map file is often providing map output path in some way.
-            # Given the error, "source_map" itself might be the issue for your specific package version.
-            #
-            # Let's go very basic if your package is older:
-            # compiled_css = sass.compile(filename=MAIN_SCSS_FILE, output_style='expanded')
-            # This would NOT generate a map.
-
-            # If you *want* the map text returned:
-            # Let's try asking for map content and writing it if returned.
-        )
-
-        # The Python `sass` package `compile` function when returning a map typically returns a tuple
-        # if `source_map` is effectively true and an external map is desired.
-        # If it returns a string, it means only CSS was generated (or map embedded).
-
-        # Check the return type to see if a map was generated as a separate item
-        if isinstance(compiled_css_result, tuple) and len(compiled_css_result) == 2:
-            compiled_css, source_map_content = compiled_css_result
-        elif isinstance(compiled_css_result, str):
-            compiled_css = compiled_css_result
-            source_map_content = None # No separate map content returned
-        else:
-            raise TypeError("sass.compile returned an unexpected type.")
-
-
-        with open(OUTPUT_CSS_FILE, 'w', encoding='utf-8') as f:
-            f.write(compiled_css)
-        print(f"Successfully compiled {MAIN_SCSS_FILE} to {OUTPUT_CSS_FILE}")
-
-        # Check if map content was returned and write it
-        if source_map_content:
-            # We must explicitly link the CSS to the map if libsass doesn't add the comment
-            # when writing map separately
-            if "sourceMappingURL" not in compiled_css:
-                 # Ensure correct relative path for sourceMappingURL from CSS to MAP
-                map_file_name_relative = os.path.basename(OUTPUT_MAP_FILE_EXPECTED)
-                compiled_css += f"\n/*# sourceMappingURL={map_file_name_relative} */"
-                with open(OUTPUT_CSS_FILE, 'w', encoding='utf-8') as f: # Re-write CSS with map link
-                    f.write(compiled_css)
-
-            with open(OUTPUT_MAP_FILE_EXPECTED, 'w', encoding='utf-8') as f:
-                f.write(source_map_content)
-            print(f"Successfully generated sourcemap to {OUTPUT_MAP_FILE_EXPECTED}")
-        else:
-            print("No separate sourcemap content was generated by sass.compile(). Check CSS file for embedded map or linking comment.")
-
-
-    except sass.CompileError as e:
-        print(f"Error compiling SCSS: {e}")
+        is_windows = sys.platform.startswith('win')
+        result = subprocess.run(command, capture_output=True, text=True, check=True, shell=is_windows)
+        if result.stderr:
+            print(f"Compilation warning:\n{result.stderr}")
+        print(f"✅ Success! SCSS compiled with sourcemap.")
+    except FileNotFoundError:
+        print("❌ Error: 'sass' command not found. Have you run 'pip install -r requirements.txt' and activated your venv?")
+    except subprocess.CalledProcessError as e:
+        print("\n" + "="*50 + "\n❌ SCSS Compilation Failed!\n" + f"   Error: {e.stderr}" + "\n" + "="*50 + "\n")
     except Exception as e:
-        # Print the full traceback for unexpected errors
-        import traceback
-        print(f"An unexpected error occurred during SCSS compilation:")
-        traceback.print_exc()
+        print(f"An unexpected error occurred: {e}")
 
-
-class SCSSChangeHandler(FileSystemEventHandler):
+class ScssChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        if event.src_path.endswith('.scss'):
-            compile_scss(event.src_path)
-    def on_created(self, event):
-        if event.src_path.endswith('.scss'):
-            compile_scss(event.src_path)
+        if not event.is_directory and event.src_path.endswith('.scss'):
+            compile_scss_with_cli(event.src_path)
 
 if __name__ == "__main__":
-    print("Performing initial SCSS compilation...")
-    compile_scss("initial_compile")
-
-    print(f"Watching directory: {SCSS_DIR} for changes...")
-    event_handler = SCSSChangeHandler()
+    compile_scss_with_cli()
+    print(f"Watching for SCSS changes in: {SCSS_DIR}")
+    event_handler = ScssChangeHandler()
     observer = Observer()
     observer.schedule(event_handler, SCSS_DIR, recursive=True)
     observer.start()
     try:
-        while True:
-            time.sleep(1)
+        while True: time.sleep(1)
     except KeyboardInterrupt:
+        print("\nWatcher stopped.")
+    finally:
         observer.stop()
-    observer.join()
-    print("SCSS watcher stopped.")
+        observer.join()

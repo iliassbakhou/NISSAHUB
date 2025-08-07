@@ -1,0 +1,110 @@
+@use '../abstracts/variables' as v;
+
+.product-detail-container {
+    display: grid;
+    gap: 3rem;
+    grid-template-columns: 1fr;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+
+    @media (min-width: 992px) {
+        // Create two columns on desktop: image and info
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.product-image-section img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1; // Enforce a square aspect ratio
+    object-fit: cover;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+    box-shadow: v.$box-shadow;
+}
+
+.product-info-section {
+    display: flex;
+    flex-direction: column;
+
+    .product-category {
+        font-size: 0.9rem;
+        color: v.$color-text-light;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .product-name {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        color: v.$color-text-dark;
+    }
+
+    .product-price {
+        font-size: 2rem;
+        font-weight: 500;
+        color: v.$color-primary;
+        margin-bottom: 1.5rem;
+    }
+
+    .product-description {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: v.$color-text-light;
+        margin-bottom: 2rem;
+    }
+}
+
+.creator-card {
+    margin-top: auto; // Pushes this card to the bottom
+    padding: 1.5rem;
+    background-color: v.$color-bg-light;
+    border-radius: v.$border-radius;
+    border: 1px solid v.$color-border;
+    border-top: 3px solid v.$color-primary;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid v.$color-border;
+        padding-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+
+    .creator-info-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        color: inherit;
+        &:hover .creator-name {
+            color: v.$color-primary;
+        }
+    }
+
+    .creator-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .creator-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: v.$color-text-dark;
+        transition: color 0.2s ease;
+    }
+
+    .creator-bio {
+        margin-top: 1rem;
+        color: v.$color-text-light;
+        font-size: 0.95rem;
+        border-top: 1px solid v.$color-border;
+        padding-top: 1rem;
+    }
+}

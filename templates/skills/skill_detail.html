@@ -30,15 +30,17 @@
             </div>
 
             <div class="skill-image-container">
-                <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}">
+                <img src="{{ skill.image_url | transform_cloudinary('card') }}" alt="{{ skill.name }}">
             </div>
 
-            <div class="skill-description-full">
+            {# --- Added .skill-content-card wrapper for styling --- #}
+            <div class="skill-description-full skill-content-card">
                 <h2>About this Course</h2>
                 <p>{{ skill.description | nl2br | safe }}</p>
             </div>
 
-            <div class="course-content-section">
+            {# --- Added .skill-content-card wrapper for styling --- #}
+            <div class="course-content-section skill-content-card">
                 <h2>Course Content</h2>
                 {% if lessons %}
                     <ul class="lesson-list">
@@ -51,7 +53,8 @@
                 {% endif %}
             </div>
 
-            <div class="discussion-section">
+            {# --- Added .skill-content-card wrapper for styling --- #}
+            <div class="discussion-section skill-content-card">
                 <h2>Discussion</h2>
                 <form id="discussion-form" data-skill-id="{{ skill.id }}">
                     <div class="form-group discussion-input-group">
@@ -90,7 +93,6 @@
                                     </div>
                                 </div>
                             </article>
-
                             <div class="replies-container" id="replies-for-{{ post.id }}">
                                 {% for reply in post.replies %}
                                 <article class="discussion-reply" id="reply-{{ reply.id }}">
@@ -135,7 +137,8 @@
                 </div>
             </div>
 
-            <div class="reviews-display-section">
+            {# --- Added .skill-content-card wrapper for styling --- #}
+            <div class="reviews-display-section skill-content-card">
                 <h2 id="reviews-heading">Reviews (<span id="review-count-display">{{ review_summary.count }}</span>)</h2>
                 <div class="review-list" id="review-list">
                     {% for review in reviews %}
@@ -156,11 +159,9 @@
                                             <span class="star {{ 'full' if i <= review.rating else 'empty' }}"></span>
                                         {% endfor %}
                                     </div>
-                                    {# --- START: NEW DELETE BUTTON --- #}
                                     {% if current_user.uid == review.user_id or current_user.uid == skill.author_id %}
                                     <button class="delete-review-btn" data-skill-id="{{ skill.id }}" data-review-id="{{ review.id }}" title="Delete review">🗑️</button>
                                     {% endif %}
-                                    {# --- END: NEW DELETE BUTTON --- #}
                                 </div>
                             </div>
                             <p class="review-text">{{ review.text | nl2br | safe }}</p>
@@ -173,7 +174,8 @@
                 </div>
             </div>
 
-            <div class="review-form-section">
+            {# --- Added .skill-content-card wrapper for styling --- #}
+            <div class="review-form-section skill-content-card">
                 <h2>Leave a Review</h2>
                 <form method="POST" action="{{ url_for('submit_review', skill_id=skill.id) }}">
                     <div class="form-group">

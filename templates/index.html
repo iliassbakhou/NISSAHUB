@@ -1,56 +1,80 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
-{% block title %}Welcome to NissaHub - Learn & Earn{% endblock %}
+{% block title %}Welcome to NissaHub - Creative Skills for Moroccan Women{% endblock %}
 
 {% block content %}
 <div class="container">
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1>Welcome to NissaHub!</h1>
-            <p>A safe, private platform for Moroccan women to learn and earn.</p>
-        </div>
-    </section>
+    <div class="hero-section">
+        <h1>Empower Your Creativity</h1>
+        <p>A safe, private, women-only platform to learn new skills and earn money.</p>
+        <a href="{{ url_for('skills_page') }}" class="btn btn-primary">Explore Courses</a>
+        <a href="{{ url_for('marketplace_page') }}" class="btn btn-secondary">Visit Marketplace</a>
+    </div>
 
     {% if featured_skills %}
-    <section class="courses-section">
-        <h2 class="section-title">Featured Courses</h2>
+    <section class="content-section">
+        <h2>Featured Courses</h2>
         <div class="card-grid">
             {% for skill in featured_skills %}
-            <div class="card">
-                <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
-                    <div class="card-image-wrapper">
-                        <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}" loading="lazy">
+            <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}" class="card-link">
+                <article class="card card-skill">
+                    <div class="card-image-container">
+                        <img src="{{ skill.image_url | transform_cloudinary }}" alt="{{ skill.name }}" class="card-image">
                     </div>
-                    <div class="card-content">
-                        <span class="card-category">{{ skill.category }}</span>
+                    <div class="card-body">
                         <h3 class="card-title">{{ skill.name }}</h3>
-                        <p class="card-description">{{ skill.description | truncate(100, True) }}</p>
+                        <p class="card-category">{{ skill.category }}</p>
                     </div>
-                </a>
-            </div>
+                </article>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if recent_products %}
+    <section class="content-section">
+        <h2>New in the Marketplace</h2>
+        <div class="card-grid">
+            {% for product in recent_products %}
+            <a href="{{ url_for('product_detail_page', product_id=product.id) }}" class="card-link">
+                <article class="card card-product">
+                    <div class="card-image-container">
+                        <img src="{{ product.image_url | transform_cloudinary }}" alt="{{ product.name }}" class="card-image">
+                        <span class="card-price-tag">Dhs {{ "%.2f"|format(product.price) }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        {% if product.author and product.author.displayName %}
+                        <div class="card-author-info">
+                            <img src="{{ product.author.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ product.author.displayName }}'s avatar" class="card-author-avatar">
+                            <span>{{ product.author.displayName }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </a>
             {% endfor %}
         </div>
     </section>
     {% endif %}
 
     {% if recent_skills %}
-    <section class="courses-section">
-        <h2 class="section-title">Recently Added</h2>
+    <section class="content-section">
+        <h2>Recently Added Courses</h2>
         <div class="card-grid">
             {% for skill in recent_skills %}
-            <div class="card">
-                <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}">
-                     <div class="card-image-wrapper">
-                        <img src="{{ skill.image_url or url_for('static', filename='img/skill_placeholder_default.jpg') }}" alt="{{ skill.name }}" loading="lazy">
+            <a href="{{ url_for('skill_detail_page', skill_id=skill.id) }}" class="card-link">
+                <article class="card card-skill">
+                    <div class="card-image-container">
+                        <img src="{{ skill.image_url | transform_cloudinary }}" alt="{{ skill.name }}" class="card-image">
                     </div>
-                    <div class="card-content">
-                        <span class="card-category">{{ skill.category }}</span>
+                    <div class="card-body">
                         <h3 class="card-title">{{ skill.name }}</h3>
-                        <p class="card-description">{{ skill.description | truncate(100, True) }}</p>
+                        <p class="card-category">{{ skill.category }}</p>
                     </div>
-                </a>
-            </div>
+                </article>
+            </a>
             {% endfor %}
         </div>
     </section>

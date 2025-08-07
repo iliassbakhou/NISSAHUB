@@ -1,18 +1,25 @@
-// static/scss/abstracts/_variables.scss
-
 // Color Palette
 $color-primary: #8e44ad;
 $color-primary-dark: #4B164C;
 $color-white: #ffffff;
+
+// --- Corrected & Added Variables ---
 $color-bg-light: #f8f9fa;
+$color-bg-dark: #343a40; // Was missing
 $color-border: #dee2e6;
 $color-text: #343a40;
+$color-text-dark: #212529; // Was missing
 $color-text-light: #6c757d;
+$color-text-inverse: #f8f9fa; // Was missing
+
+$color-grey-light: #e9ecef; // Was missing
+$color-grey-medium: #ced4da; // Was missing
+
 $color-success: #28a745;
 $color-danger: #d32f2f;
 $color-danger-bg: #ffebee;
 $color-danger-border: #ffcdd2;
-
+// --- End Correction ---
 
 // Typography
 $font-primary: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
