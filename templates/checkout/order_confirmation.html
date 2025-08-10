@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container order-confirmation-page">
+    
+    <div class="confirmation-box">
+        <div class="confirmation-icon">✓</div>
+        <h1 class="confirmation-title">Thank You for Your Order!</h1>
+        <p class="confirmation-message">Your purchase has been successfully processed. A confirmation has been sent to your email.</p>
+        
+        <div class="order-details">
+            <h3>Order Summary</h3>
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Order Date:</strong> {{ order.created_at | format_datetime }}</p>
+            
+            <ul class="order-item-list">
+                {# FIX: Looping over 'order.order_items' instead of the conflicting 'order.items' #}
+                {% for item in order.order_items %}
+                <li class="order-item">
+                    <span class="item-name">{{ item.name }} (x{{ item.quantity }})</span>
+                    <span class="item-price">Dhs {{ "%.2f"|format(item.price) }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="order-total">
+                <strong>Total:</strong>
+                <strong>Dhs {{ "%.2f"|format(order.total_price) }}</strong>
+            </div>
+        </div>
+        
+        <div class="confirmation-actions">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Continue Shopping</a>
+            <a href="{{ url_for('dashboard_page') }}" class="btn btn-secondary">Go to Dashboard</a>
+        </div>
+    </div>
+
+</div>
+{# This script is essential to clear the cart after a successful order #}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if(localStorage.getItem('nissahub_cart')) {
+            localStorage.removeItem('nissahub_cart');
+            // We dispatch an event to notify the header to update its count
+            window.dispatchEvent(new Event('cartUpdated'));
+            console.log('Cart cleared after successful order.');
+        }
+    });
+</script>
+{% endblock %}

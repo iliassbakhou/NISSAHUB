@@ -1,4 +1,3 @@
-// static/scss/base/_base.scss
 @use '../abstracts/variables' as v;
 
 *,
@@ -64,9 +63,4 @@ h3 { font-size: 1.75rem; }
 
 p {
     margin-bottom: v.$spacing-unit * 1.25;
-}
-
-// Global helper for elements hidden by default, revealed by JS
-.nav-item-hidden {
-    display: none !important;
 }

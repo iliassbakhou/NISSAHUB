@@ -12,11 +12,12 @@
 @use 'layout/header';
 
 @use 'pages/admin';
+@use 'pages/cart'; // <-- NEW LINE ADDED HERE
 @use 'pages/home';
 @use 'pages/homepage';
 @use 'pages/marketplace';
 @use 'pages/my-creations';
-@use 'pages/product-detail'; // <-- NEW LINE ADDED HERE
+@use 'pages/product-detail';
 @use 'pages/profile';
 @use 'pages/skill-detail';
 @use 'pages/skills';

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Your Shopping Cart</h1>
+    </div>
+
+    <div class="cart-container" id="cart-container">
+        <!-- The content of the cart will be dynamically generated here by JavaScript -->
+        
+        <!-- This is a template for an empty cart, which JS will show/hide -->
+        <div id="empty-cart-message" class="empty-state-message" style="display: none;">
+            <p>Your cart is currently empty.</p>
+            <a href="{{ url_for('marketplace_page') }}" class="btn btn-primary">Discover Products</a>
+        </div>
+        
+        <!-- This is the main structure that will be populated -->
+        <div class="cart-layout">
+            <div class="cart-items-list">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Product</th>
+                            <th>Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items-container">
+                        <!-- Cart item rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="cart-summary" id="cart-summary-box" style="display: none;">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">Dhs 0.00</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span id="cart-total">Dhs 0.00</span>
+                </div>
+                <button class="btn btn-primary btn-block btn-lg">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

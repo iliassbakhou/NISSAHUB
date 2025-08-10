@@ -57,11 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
-    // --- START: NEW SHOPPING CART MODULE ---
+    
+    // --- Shopping Cart Module ---
     const cartModule = (() => {
         const cartCountBadge = document.getElementById('cart-item-count');
         const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const cartContainer = document.getElementById('cart-container');
         let cart = [];
 
         function loadCart() {
@@ -92,10 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemInCart = cart.find(item => item.id === productId);
 
             if (itemInCart) {
-                addToCartBtn.textContent = '✓ Added to Cart';
+                addToCartBtn.innerHTML = `✓ Added to Cart`;
                 addToCartBtn.disabled = true;
             } else {
-                addToCartBtn.textContent = 'Add to Cart';
+                addToCartBtn.innerHTML = 'Add to Cart';
                 addToCartBtn.disabled = false;
             }
         }
@@ -103,8 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function addItem(product) {
             const existingItem = cart.find(item => item.id === product.id);
             if (existingItem) {
-                // For now, we only allow one of each digital product
-                console.warn("Item already in cart. Quantity increase not implemented.");
+                console.warn("Item already in cart.");
             } else {
                 cart.push({ ...product, quantity: 1 });
             }
@@ -113,8 +113,119 @@ document.addEventListener('DOMContentLoaded', () => {
             updateButtonState();
         }
 
+        function removeItem(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            renderCartPage(); 
+            updateCartCount();
+        }
+
+        function renderCartPage() {
+            if (!cartContainer) return; 
+            
+            const itemsContainer = document.getElementById('cart-items-container');
+            const summaryBox = document.getElementById('cart-summary-box');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            
+            itemsContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                summaryBox.style.display = 'none';
+                emptyCartMessage.style.display = 'block';
+                return;
+            }
+
+            summaryBox.style.display = 'block';
+            emptyCartMessage.style.display = 'none';
+
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="cart-item-info">
+                            <img src="${item.image}" alt="${item.name}">
+                            <a href="/product/${item.id}" class="item-name">${item.name}</a>
+                        </div>
+                    </td>
+                    <td class="cart-item-price">Dhs ${item.price.toFixed(2)}</td>
+                    <td>
+                        <button class="remove-from-cart-btn" data-product-id="${item.id}" title="Remove item">
+                            &times;
+                        </button>
+                    </td>
+                `;
+                itemsContainer.appendChild(tr);
+            });
+
+            document.getElementById('cart-subtotal').textContent = `Dhs ${subtotal.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `Dhs ${subtotal.toFixed(2)}`;
+            
+            itemsContainer.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = e.currentTarget.dataset.productId;
+                    removeItem(productId);
+                });
+            });
+            
+            const checkoutBtn = summaryBox.querySelector('button');
+            if(checkoutBtn){
+                checkoutBtn.addEventListener('click', () => {
+                    window.location.href = '/checkout';
+                });
+            }
+        }
+        
+        function renderCheckoutPage() {
+            const checkoutForm = document.getElementById('checkout-form');
+            if (!checkoutForm) return;
+
+            const summaryItemsContainer = document.getElementById('checkout-summary-items');
+            summaryItemsContainer.innerHTML = '';
+            
+            let subtotal = 0;
+            if(cart.length === 0){
+                summaryItemsContainer.innerHTML = '<p>Your cart is empty. Please add products before checking out.</p>';
+                document.getElementById('confirm-purchase-btn').disabled = true;
+                return;
+            }
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'summary-item';
+                itemDiv.innerHTML = `
+                    <span class="item-name">${item.name} (x${item.quantity})</span>
+                    <span class="item-price">Dhs ${itemTotal.toFixed(2)}</span>
+                `;
+                summaryItemsContainer.appendChild(itemDiv);
+            });
+
+            document.getElementById('checkout-subtotal').textContent = `Dhs ${subtotal.toFixed(2)}`;
+            document.getElementById('checkout-total').textContent = `Dhs ${subtotal.toFixed(2)}`;
+            document.getElementById('cart-data-input').value = JSON.stringify(cart);
+
+            // --- THIS IS THE CRITICAL ADDITION ---
+            checkoutForm.addEventListener('submit', (e) => {
+                const confirmBtn = document.getElementById('confirm-purchase-btn');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Processing...';
+            });
+        }
+
         function init() {
+            window.addEventListener('cartUpdated', () => {
+                loadCart();
+                renderCartPage();
+            });
+
             loadCart();
+
             if (addToCartBtn) {
                 addToCartBtn.addEventListener('click', () => {
                     const product = {
@@ -126,30 +237,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     addItem(product);
                 });
             }
+            renderCartPage();
+            renderCheckoutPage();
         }
 
         return { init };
     })();
 
     cartModule.init();
-    // --- END: NEW SHOPPING CART MODULE ---
 
-
-    // --- START: REVIEW DELETE ---
     const reviewList = document.getElementById('review-list');
     if(reviewList) {
         reviewList.addEventListener('click', function(event) {
             if(!event.target.matches('.delete-review-btn')) return;
-
             const button = event.target;
             const skillId = button.dataset.skillId;
             const reviewId = button.dataset.reviewId;
             const reviewCard = document.getElementById(`review-${reviewId}`);
-
-            if(!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-                return;
-            }
-
+            if(!confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
             fetch(`/skill/${skillId}/review/${reviewId}`, { method: 'DELETE' })
                 .then(res => res.json().then(data => ({ ok: res.ok, data })))
                 .then(({ ok, data }) => {
@@ -161,9 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             reviewCard.remove();
                             updateReviewCount();
                         }, 300);
-                    } else {
-                        throw new Error(data.message || 'Failed to delete the review.');
-                    }
+                    } else { throw new Error(data.message || 'Failed to delete the review.'); }
                 })
                 .catch(err => {
                     console.error('Review deletion error:', err);
@@ -176,11 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const reviewCountSpan = document.getElementById('review-count-display');
         const reviewListContainer = document.getElementById('review-list');
         const currentCount = reviewListContainer.querySelectorAll('.review-card').length;
-        
         reviewCountSpan.textContent = currentCount;
-        
         if (currentCount === 0) {
-            const noReviewsMessage = document.getElementById('no-reviews-message')
+            const noReviewsMessage = document.getElementById('no-reviews-message');
             if (noReviewsMessage) {
                  noReviewsMessage.style.display = 'block';
             } else {
@@ -192,13 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    // --- END: REVIEW DELETE ---
-
-    // --- Full Discussion Feature ---
     const discussionList = document.getElementById('discussion-list');
     const discussionForm = document.getElementById('discussion-form');
     
-    // Check if these elements exist before adding listeners
     const SKILL_AUTHOR_ID = discussionList?.dataset.skillAuthorId;
     const CURRENT_USER_ID = discussionList?.dataset.currentUserId;
     const CURRENT_USER_AVATAR = document.querySelector('.discussion-input-group .discussion-post-avatar')?.src || '/static/img/avatar_placeholder.png';

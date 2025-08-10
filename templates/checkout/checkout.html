@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - NissaHub{% endblock %}
+
+{% block content %}
+<div class="container checkout-page">
+    <div class="page-header">
+        <h1>Checkout</h1>
+        <p>Please review your order before completing the purchase.</p>
+    </div>
+
+    <form class="checkout-layout" id="checkout-form" method="POST" action="{{ url_for('submit_checkout') }}">
+        <div class="order-summary-card">
+            <h2>Order Summary</h2>
+            <div id="checkout-summary-items">
+                <!-- Items will be populated by JavaScript -->
+                <p>Loading your cart...</p>
+            </div>
+            <div class="summary-totals">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="checkout-subtotal">--</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span id="checkout-total">--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-card">
+            <h2>Confirm Purchase</h2>
+            <p>This is a simulated checkout process. No payment will be taken. Clicking "Complete Order" will create an order record in our system.</p>
+            
+            <!-- Hidden input to carry cart data to the backend -->
+            <input type="hidden" name="cart_data" id="cart-data-input">
+            
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="confirm-purchase-btn">Complete Order</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

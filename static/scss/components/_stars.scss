@@ -1,6 +1,5 @@
 @use '../abstracts/variables' as v;
 
-// Style for displaying existing star ratings (non-interactive)
 .star-rating-display {
     display: inline-flex;
     font-size: 1.2rem;
@@ -24,16 +23,14 @@
     }
 }
 
-// --- START: DEFINITIVE FIX FOR THE REVIEW FORM ---
-// Style for the interactive star rating form
 .star-rating-form {
   display: flex;
-  flex-direction: row-reverse; // This is the key trick for the hover effect
+  flex-direction: row-reverse;
   justify-content: flex-end;
   font-size: 2rem;
   
   input[type="radio"] {
-    display: none; // Hide the actual radio buttons
+    display: none;
   }
 
   label {
@@ -43,16 +40,13 @@
     padding: 0 0.1em;
     margin-bottom: 0;
 
-    // When a star (or any star to its right) is hovered, they light up
     &:hover,
     &:hover ~ label {
       color: #ffc107;
     }
   }
 
-  // The star that is checked (and all to its right) remain lit
   input[type="radio"]:checked ~ label {
     color: #ffc107;
   }
 }
-// --- END: DEFINITIVE FIX FOR THE REVIEW FORM ---

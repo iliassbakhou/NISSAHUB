@@ -1,0 +1,117 @@
+@use '../abstracts/variables' as v;
+
+.cart-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    
+    @media (min-width: 992px) {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    
+    thead {
+        border-bottom: 1px solid v.$color-border;
+    }
+
+    th {
+        text-align: left;
+        padding: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: v.$color-text-light;
+    }
+
+    td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid v.$color-border;
+    }
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: v.$border-radius;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        color: v.$color-text-dark;
+    }
+}
+
+.cart-item-price {
+    font-weight: 500;
+}
+
+.remove-from-cart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: v.$color-text-light;
+    transition: color 0.2s;
+    &:hover {
+        color: v.$color-danger;
+    }
+}
+
+.cart-summary {
+    background: v.$color-white;
+    border: 1px solid v.$color-border;
+    border-radius: v.$border-radius;
+    padding: 1.5rem;
+    align-self: flex-start;
+    position: sticky;
+    top: v.$spacing-unit * 2;
+    
+    h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid v.$color-border;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        color: v.$color-text-light;
+
+        span:last-child {
+            font-weight: 500;
+            color: v.$color-text;
+        }
+    }
+    
+    .total-row {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid v.$color-border;
+        
+        span {
+            color: v.$color-text-dark;
+        }
+    }
+
+    .btn {
+        margin-top: 1.5rem;
+    }
+}
