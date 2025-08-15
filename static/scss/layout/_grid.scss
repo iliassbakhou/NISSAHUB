@@ -1,9 +1,12 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .card-grid {
     display: grid;
-    gap: v.$spacing-unit * 2;
+    gap: $spacing-unit * 2.5; // Slightly more gap for a cleaner look
     grid-template-columns: 1fr;
+
+    // A robust grid that forces items in a row to the same height
+    grid-auto-rows: 1fr; 
 
     @media (min-width: 768px) {
         grid-template-columns: repeat(2, 1fr);

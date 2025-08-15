@@ -29,17 +29,20 @@
         {% include 'partials/_footer.html' %}
     </div>
 
-    <!-- Firebase & Core Scripts -->
+    <!-- Firebase SDKs -->
     <script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
+    
+    <!-- DEFINITIVE FIX: Load the dedicated cart script BEFORE the main script -->
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
     <!-- Simple script for footer year -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const year = document.getElementById('current-year');
-            if (year) {
-                year.textContent = new Date().getFullYear();
+            const yearSpan = document.querySelector('.current-year');
+            if (yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
             }
         });
     </script>

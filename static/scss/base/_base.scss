@@ -1,66 +1,131 @@
-@use '../abstracts/variables' as v;
+// static/scss/base/_base.scss
+@use '../abstracts/variables' as *;
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: inherit;
 }
 
 html {
-    font-size: 16px;
-    scroll-behavior: smooth;
+    // Defines what 1rem is. 10px / 16px = 62.5%
+    font-size: 62.5%; 
 }
 
 body {
-    font-family: v.$font-primary;
+    box-sizing: border-box;
+    font-family: $font-family-base;
+    font-weight: 400;
     line-height: 1.6;
-    background-color: v.$color-bg-light;
-    color: v.$color-text;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+    color: $color-grey-dark-2;
+    background-color: $color-grey-light-1;
 
-main.main-content {
-    flex-grow: 1;
-    padding: (v.$spacing-unit * 2) 0;
+    // CORE FIX: Apply the base font size to the entire application.
+    font-size: $font-size-base; 
 }
 
 .container {
-    max-width: v.$container-max-width;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 v.$spacing-unit;
+    max-width: $container-max-width;
+    margin: 0 auto;
+    // Enhancement: Responsive padding for better spacing
+    padding: 4rem 2rem;
 }
 
+
+// AESTHETIC ENHANCEMENTS =====================================
+
+// 1. Consistent & Legible Headings
+// ------------------------------------
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-family-base;
+    color: $color-grey-dark-3; // Use a darker color for more contrast
+    font-weight: 600; // Slightly bolder than body copy
+    line-height: 1.3;
+    margin-bottom: 1.5rem; // Default spacing below headings
+}
+
+h1 { font-size: 3.2rem; }
+h2 { font-size: 2.4rem; }
+h3 { font-size: 2.0rem; }
+h4 { font-size: 1.8rem; }
+// h5, h6 use base font-size by default, which is fine
+
+// 2. Consistent Link Styling
+// ------------------------------------
 a {
-    color: v.$color-primary;
+    color: $color-primary; // Use brand color for all links
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
         text-decoration: underline;
-        color: v.$color-primary-dark;
     }
 }
 
-img {
-    max-width: 100%;
-    display: block;
+
+// CSS CUSTOM PROPERTIES =====================================
+// These are useful for JS or inline HTML styles
+:root {
+    --color-primary: #{$color-primary};
+    --color-primary-light: #{$color-primary-light};
+    --color-primary-dark: #{$color-primary-dark};
+
+    --color-grey-light-1: #{$color-grey-light-1};
+    --color-grey-light-2: #{$color-grey-light-2};
+    --color-grey-dark-1: #{$color-grey-dark-1};
+    --color-grey-dark-2: #{$color-grey-dark-2};
+    --color-grey-dark-3: #{$color-grey-dark-3};
+
+    --color-white: #{$color-white};
+    --color-black: #{$color-black};
+    
+    --color-success: #{$color-success};
+    --color-error: #{$color-error};
+    --color-warning: #{$color-warning};
+    --color-info: #{$color-info};
+
+    --font-size-base: #{$font-size-base};
+
+    --shadow-light: #{$shadow-light};
+    --shadow-dark: #{$shadow-dark};
+    --border-radius-sm: #{$border-radius-sm};
+    --border-radius-md: #{$border-radius-md};
+    --border-radius-lg: #{$border-radius-lg};
 }
 
-h1, h2, h3, h4, h5, h6 {
-    color: v.$color-primary-dark;
-    line-height: 1.3;
-    margin-bottom: v.$spacing-unit;
+
+// FLASH MESSAGES =====================================
+.flash-messages {
+    position: fixed;
+    top: 8rem;
+    right: 2rem;
+    z-index: 10000;
+    list-style: none;
+    max-width: 40rem;
 }
 
-h1 { font-size: v.$font-size-h1; }
-h2 { font-size: v.$font-size-h2; }
-h3 { font-size: 1.75rem; }
+.flash-message {
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-white);
+    font-weight: 500;
+    box-shadow: var(--shadow-dark);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideInAndFadeOut 5s forwards;
 
-p {
-    margin-bottom: v.$spacing-unit * 1.25;
+    &.success { background-color: var(--color-success); }
+    &.error { background-color: var(--color-error); }
+    &.info { background-color: var(--color-info); }
+    &.warning { background-color: var(--color-warning); }
+}
+
+@keyframes slideInAndFadeOut {
+    0% { opacity: 0; transform: translateX(100%); }
+    15% { opacity: 1; transform: translateX(0); }
+    85% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(100%); }
 }

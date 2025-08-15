@@ -1,0 +1,40 @@
+@use '../abstracts/variables' as *;
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 3rem;
+}
+
+.dashboard-panel {
+    background-color: $color-white;
+    border-radius: $border-radius-lg;
+    border: 1px solid $color-grey-light-2;
+    padding: 2.5rem;
+    box-shadow: $shadow-light;
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+        margin-top: 0;
+        border-bottom: 1px solid $color-grey-light-2;
+        padding-bottom: 1.5rem;
+    }
+
+    p {
+        font-size: 1.5rem;
+        color: $color-grey-dark-1;
+        flex-grow: 1; // Pushes actions to the bottom
+        line-height: 1.7;
+    }
+
+    .panel-actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1.5rem;
+        
+        .btn {
+            flex-grow: 1; // Makes buttons equal width
+        }
+    }
+}    

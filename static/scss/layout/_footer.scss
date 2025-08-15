@@ -1,19 +1,19 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .main-footer {
-    background-color: v.$color-bg-dark;
-    color: v.$color-text-inverse;
-    padding: 2rem v.$spacing-unit;
+    background-color: $color-grey-dark-3;
+    color: $color-white;
+    padding: 2rem $spacing-unit;
     margin-top: 4rem;
 }
 
 .footer-content {
-    max-width: v.$container-max-width;
+    max-width: $container-max-width;
     margin: 0 auto;
     text-align: center;
 
     a {
-        color: v.$color-text-inverse;
+        color: $color-white;
         text-decoration: none;
         margin: 0 0.5rem;
 

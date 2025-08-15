@@ -1,3 +1,5 @@
+// static/scss/main.scss
+
 @forward 'abstracts/variables';
 
 @use 'base/base';
@@ -12,7 +14,9 @@
 @use 'layout/header';
 
 @use 'pages/admin';
-@use 'pages/cart'; // <-- NEW LINE ADDED HERE
+@use 'pages/auth';
+@use 'pages/cart';
+@use 'pages/checkout';
 @use 'pages/home';
 @use 'pages/homepage';
 @use 'pages/marketplace';
@@ -21,3 +25,4 @@
 @use 'pages/profile';
 @use 'pages/skill-detail';
 @use 'pages/skills';
+@use 'pages/dashboard'; // Add this line

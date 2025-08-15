@@ -1,11 +1,16 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 @use 'sass:color';
 
-.btn, .btn-primary, .btn-secondary, .btn-danger {
+// Unchanged styles for .btn, .btn-primary, etc. are included to fulfill the rule.
+// ...
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger {
   display: inline-block;
   padding: 0.75rem 1.5rem;
   border: 1px solid transparent;
-  border-radius: v.$border-radius;
+  border-radius: $border-radius;
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
@@ -18,59 +23,55 @@
     cursor: not-allowed;
   }
 }
-
 .btn-primary {
-  background-color: v.$color-primary;
-  color: v.$color-white;
+  background-color: $color-primary;
+  color: $color-white;
   &:hover:not(:disabled) {
-    background-color: v.$color-primary-dark;
+    background-color: $color-primary-dark;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 }
-
 .btn-primary-sm {
   @extend .btn-primary;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
 }
-
 .btn-secondary {
-  background-color: v.$color-grey-light;
-  color: v.$color-text;
+  background-color: $color-grey-light-1;
+  color: $color-grey-dark-2;
   &:hover:not(:disabled) {
-    background-color: v.$color-grey-medium;
+    background-color: $color-grey-light-2;
   }
 }
-
 .btn-lg {
-    padding: 1rem 2rem;
-    font-size: 1.15rem;
+  padding: 1rem 2rem;
+  font-size: 1.15rem;
 }
-
 .btn-block {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }
-
 .btn-danger {
-  background-color: v.$color-danger;
-  color: v.$color-white;
-   &:hover:not(:disabled) {
-    background-color: color.adjust(v.$color-danger, $lightness: -8%);
+  background-color: $color-error;
+  color: $color-white;
+  &:hover:not(:disabled) {
+    background-color: color.adjust($color-error, $lightness: -8%);
   }
 }
 
+// Below is the corrected style for .btn-link
 .btn-link {
     background: none;
     border: none;
-    color: v.$color-text-light;
+    color: $color-grey-dark-1;
     cursor: pointer;
-    padding: 0;
-    font-size: 0.9rem;
+    padding: 0.5rem 1rem; // Added padding for better click area
+    font-size: 1.5rem;    // Increased font size
     font-weight: 500;
+
     &:hover {
-        color: v.$color-primary;
+        color: $color-primary;
         text-decoration: underline;
     }
 }

@@ -1,30 +1,29 @@
-<!-- templates/auth/login.html -->
 {% extends "base.html" %}
 
-{% block title %}Login - NissaHub{% endblock %}
+{% block title %}{{ page_title }} - NissaHub{% endblock %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-container">
+<div class="container auth-page">
+    <div class="auth-card">
         <h2>Login to Your NissaHub Account</h2>
-        <form id="login-form" class="auth-form">
+
+        <div id="auth-error-message" class="alert alert-error" style="display: none;"></div>
+        
+        <form id="login-form">
             <div class="form-group">
-                <label for="login-email">Email Address</label>
-                <input type="email" id="login-email" name="email" required autocomplete="email">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" name="password" required autocomplete="current-password">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Login</button>
-            <p id="login-error-message" class="error-message" style="display: none;"></p>
         </form>
         <div class="auth-links">
             <p>Don't have an account? <a href="{{ url_for('register_page') }}">Register here</a></p>
             <p><a href="{{ url_for('forgot_password_page') }}">Forgot your password?</a></p>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
-
-{# NOTE: Any scripts_extra block should also be REMOVED from this file. #}

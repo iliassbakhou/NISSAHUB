@@ -12,20 +12,26 @@
     {% if products %}
         <div class="card-grid">
             {% for product in products %}
+            <!-- CRITICAL FIX: Rebuilt to use the one, true, professional card structure -->
             <a href="{{ url_for('product_detail_page', product_id=product.id) }}" class="card-link">
-                <article class="card card-product">
-                    <div class="card-image-container">
+                <article class="card">
+                    <div class="card-image-container" style="aspect-ratio: 1/1;">
                         <img src="{{ product.image_url | transform_cloudinary }}" alt="{{ product.name }}" class="card-image">
-                        <span class="card-price-tag">{{ "Dhs %.2f"|format(product.price) }}</span>
                     </div>
                     <div class="card-body">
+                        <p class="card-category">{{ product.category or 'Product' }}</p>
                         <h3 class="card-title">{{ product.name }}</h3>
-                        {% if product.author and product.author.displayName %}
-                        <div class="card-author-info">
-                             <img src="{{ product.author.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ product.author.displayName }}'s avatar" class="card-author-avatar">
-                            <span>{{ product.author.displayName }}</span>
+
+                        <div class="card-footer">
+                            <span class="card-price">{{ "%.2f MAD"|format(product.price|float) }}</span>
+                            
+                            {% if product.author and product.author.displayName %}
+                            <div class="card-author-info">
+                                <img src="{{ product.author.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ product.author.displayName }}'s avatar" class="card-author-avatar">
+                                <span class="card-author-name">{{ product.author.displayName }}</span>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                     </div>
                 </article>
             </a>

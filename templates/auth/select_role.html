@@ -1,100 +1,52 @@
-<!-- templates/auth/select_role.html -->
 {% extends "base.html" %}
 
-{% block title %}{{ page_title }} - NissaHub{% endblock %}
+{% block title %}Choose Your Role - NissaHub{% endblock %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-container" style="max-width: 700px;">
-        <h2>One Last Step: Choose Your Role</h2>
-        <p>This helps us tailor your experience on NissaHub. This choice cannot be changed later.</p>
-
-        {% if error %}
-            <p class="error-message" style="display: block;">{{ error }}</p>
-        {% endif %}
-
-        <form method="POST" action="{{ url_for('select_role_page') }}" class="role-selection-form">
-            <div class="role-options">
-                <label for="role-customer" class="role-option">
-                    <input type="radio" id="role-customer" name="role" value="customer" required>
-                    <div class="role-option-content">
-                        <div class="role-icon">🎨</div>
-                        <h3 class="role-title">I'm a Customer</h3>
-                        <p class="role-description">I'm here to browse, learn new skills, and purchase creative products.</p>
-                    </div>
-                </label>
-
-                <label for="role-creator" class="role-option">
-                    <input type="radio" id="role-creator" name="role" value="creator" required>
-                    <div class="role-option-content">
-                        <div class="role-icon">👩‍🏫</div>
-                        <h3 class="role-title">I'm a Creator</h3>
-                        <p class="role-description">I want to create courses, sell digital products, and share my skills.</p>
-                    </div>
-                </label>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 20px;">Complete My Profile</button>
-        </form>
+<div class="select-role-layout">
+    <div class="branding-column">
+        <div class="branding-content">
+            <img src="{{ url_for('static', filename='img/nissahub-logo.svg') }}" alt="NissaHub Logo" class="auth-logo">
+            <h1>A Community of Creativity & Skill</h1>
+            <p>Join a network of talented Moroccan women learning, creating, and earning together.</p>
+        </div>
     </div>
-</section>
-{% endblock %}
-
-{% block styles_extra %}
-<style>
-/* Simple styling for the role selection page */
-.role-options {
-    display: flex;
-    gap: 20px;
-    margin-top: 2rem;
-}
-.role-option {
-    flex: 1;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    text-align: center;
-    position: relative; /* For the radio button */
-}
-.role-option:hover {
-    border-color: #A367B1; /* A nice purple from your likely palette */
-    transform: translateY(-5px);
-}
-.role-option input[type="radio"] {
-    /* Hide the default radio button */
-    opacity: 0;
-    position: fixed;
-    width: 0;
-}
-.role-option input[type="radio"]:checked + .role-option-content {
-    /* Style when selected */
-    outline: 3px solid #A367B1;
-    border-radius: 6px;
-}
-.role-option-content {
-    padding: 10px;
-}
-.role-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-.role-title {
-    margin-bottom: 0.5rem;
-}
-.role-description {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    border: 1px solid #f5c6cb;
-    text-align: center;
-}
-</style>
+    <div class="form-column">
+        <div class="auth-card">
+            <h2>Welcome! One last step...</h2>
+            <p class="text-center">Please choose how you'd like to use NissaHub. This helps us personalize your experience.</p>
+            
+            <form id="select-role-form" method="POST">
+                <div class="role-selection-group">
+                    <div class="role-option">
+                        <input type="radio" id="role-customer" name="role" value="customer" required checked>
+                        <label for="role-customer" class="radio-card-label">
+                            <div class="role-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2-15.86c1.03.13 2 .45 2.87.93H13v-.93zM13 7h5.24c.25.31.48.65.68 1H13V7zm0 3h6.74c.08.33.15.66.19 1H13v-1zm0 3h6.93c-.07.34-.14.67-.23 1H13v-1zm0 3h5.93c-.33.44-.7.83-1.11 1.18l-1.07-1.07.2-.21H13v.1z"/></svg>
+                            </div>
+                            <div class="role-text">
+                                <strong class="role-title">I want to learn</strong>
+                                <span class="role-description">Browse courses and buy products from Moroccan creators.</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="role-option">
+                        <input type="radio" id="role-creator" name="role" value="creator">
+                        <label for="role-creator" class="radio-card-label">
+                            <div class="role-icon">
+                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.22-1.05-.59-1.42zM13 20.01L4 11V4h7l9 9-7 7.01z"/><circle cx="6.5" cy="6.5" r="1.5"/></svg>
+                            </div>
+                            <div class="role-text">
+                                <strong class="role-title">I want to teach & sell</strong>
+                                <span class="role-description">Create your own courses and sell digital products.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <!-- CRITICAL FIX: The button is now properly sized -->
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Complete Registration</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

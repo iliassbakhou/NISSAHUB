@@ -1,18 +1,23 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
+// THIS IS THE DEFINITIVE FIX FOR ALL PAGE HEADERS
 .page-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    padding: 3rem 0;
+    margin-bottom: 4rem;
 
     h1 {
-        margin-bottom: 0.5rem;
+        font-size: 4.2rem; // Significantly larger for impact
+        font-weight: 700;
+        margin-bottom: 1.5rem; // More space below title
     }
 
     p {
-        font-size: 1.1rem;
-        color: v.$color-text-light;
-        max-width: 600px;
+        font-size: 1.8rem; // Larger, more readable subheading
+        color: $color-grey-dark-1;
+        max-width: 65ch; // Use character units for optimal line length
         margin: 0 auto;
+        line-height: 1.7;
     }
 }
 
@@ -20,18 +25,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: v.$spacing-unit;
-    padding: v.$spacing-unit * 2;
-    background-color: v.$color-white;
-    border: 1px solid v.$color-border;
-    border-radius: v.$border-radius;
+    gap: $spacing-unit * 2;
+    padding: $spacing-unit * 2.5;
+    background-color: $color-white;
+    border: 1px solid $color-grey-light-2;
+    border-radius: $border-radius-lg;
     margin-bottom: 2.5rem;
     text-align: center;
 
     @media(min-width: 768px) {
         flex-direction: row;
         text-align: left;
-        gap: v.$spacing-unit * 2;
+        gap: $spacing-unit * 3;
     }
 }
 
@@ -40,8 +45,8 @@
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid v.$color-white;
-    box-shadow: 0 0 10px rgba(v.$color-text, 0.15);
+    border: 3px solid $color-white;
+    box-shadow: 0 4px 12px rgba($color-grey-dark-2, 0.15);
     flex-shrink: 0;
 }
 
@@ -50,34 +55,34 @@
 }
 
 .creator-info p {
-    color: v.$color-text-light;
+    color: $color-grey-dark-1;
     margin-bottom: 0;
 }
 
 .storefront-nav {
-    border-bottom: 1px solid v.$color-border;
-    margin-bottom: v.$spacing-unit * 2;
+    border-bottom: 1px solid $color-grey-light-2;
+    margin-bottom: $spacing-unit * 3;
 }
 
 .storefront-tab {
     background: none;
     border: none;
-    padding: v.$spacing-unit (v.$spacing-unit * 1.5);
-    font-size: 1.1rem;
+    padding: $spacing-unit ($spacing-unit * 1.5);
+    font-size: 1.6rem;
     font-weight: 500;
     cursor: pointer;
-    color: v.$color-text-light;
+    color: $color-grey-dark-1;
     border-bottom: 3px solid transparent;
     margin-bottom: -1px;
     transition: color 0.2s ease, border-color 0.2s ease;
 
     &:hover {
-        color: v.$color-text;
+        color: $color-grey-dark-2;
     }
 
     &.active {
-        color: v.$color-primary;
-        border-bottom-color: v.$color-primary;
+        color: $color-primary;
+        border-bottom-color: $color-primary;
     }
 }
 
@@ -91,11 +96,11 @@
 
 .empty-panel-message {
     text-align: center;
-    padding: (v.$spacing-unit * 4) (v.$spacing-unit * 2);
-    background-color: v.$color-white;
-    border-radius: v.$border-radius;
-    border: 1px solid v.$color-border;
+    padding: ($spacing-unit * 4) ($spacing-unit * 2);
+    background-color: $color-grey-light-1;
+    border-radius: $border-radius;
+    border: 1px solid $color-grey-light-2;
 
-    h3 { margin-bottom: v.$spacing-unit * 0.5; }
-    p { color: v.$color-text-light; }
+    h3 { margin-bottom: $spacing-unit * 0.5; }
+    p { color: $color-grey-dark-1; }
 }

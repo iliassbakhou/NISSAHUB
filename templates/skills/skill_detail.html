@@ -8,7 +8,8 @@
         <div class="skill-detail-main">
             <h1 class="skill-title">{{ skill.name }}</h1>
             <div class="skill-meta">
-                {% if review_summary.count > 0 %}
+                {# The review summary is now only calculated for enrolled users, so we must check if it exists #}
+                {% if review_summary and review_summary.count > 0 %}
                 <div class="meta-rating">
                     <div class="star-rating-display" title="{{ review_summary.average }} out of 5 stars">
                         {% for i in range(1, 6) %}
@@ -33,180 +34,209 @@
                 <img src="{{ skill.image_url | transform_cloudinary('card') }}" alt="{{ skill.name }}">
             </div>
 
-            {# --- Added .skill-content-card wrapper for styling --- #}
             <div class="skill-description-full skill-content-card">
                 <h2>About this Course</h2>
                 <p>{{ skill.description | nl2br | safe }}</p>
             </div>
+            
+            {# --- BEGIN ENROLLMENT-AWARE CONTENT --- #}
 
-            {# --- Added .skill-content-card wrapper for styling --- #}
             <div class="course-content-section skill-content-card">
                 <h2>Course Content</h2>
                 {% if lessons %}
-                    <ul class="lesson-list">
-                        {% for lesson in lessons %}
-                            <li>{{ lesson.title }}</li>
-                        {% endfor %}
-                    </ul>
+                    {# Enrolled users see a clickable list #}
+                    {% if is_enrolled %}
+                        <ul class="lesson-list enrolled">
+                            {% for lesson in lessons %}
+                                <li><a href="{{ url_for('course_player_page', skill_id=skill.id, lesson_id=lesson.id) }}">{{ lesson.order }}. {{ lesson.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {# Non-enrolled users see a non-clickable preview list #}
+                    {% else %}
+                        <p>Enroll to get full access to all lessons.</p>
+                        <ul class="lesson-list preview">
+                            {% for lesson in lessons %}
+                                <li>{{ lesson.order }}. {{ lesson.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 {% else %}
                     <p>The creator has not added any lessons to this course yet.</p>
                 {% endif %}
             </div>
 
-            {# --- Added .skill-content-card wrapper for styling --- #}
-            <div class="discussion-section skill-content-card">
-                <h2>Discussion</h2>
-                <form id="discussion-form" data-skill-id="{{ skill.id }}">
-                    <div class="form-group discussion-input-group">
-                        <img class="discussion-post-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
-                        <textarea name="content" placeholder="Ask a question..." rows="2" required></textarea>
-                        <button type="submit" class="btn btn-primary">Post</button>
-                    </div>
-                </form>
-                <div id="discussion-list" data-skill-id="{{ skill.id }}" data-skill-author-id="{{ skill.author_id }}" data-current-user-id="{{ current_user.uid }}">
-                    {% if discussions %}
-                        {% for post in discussions %}
-                        <div class="discussion-thread" id="thread-{{ post.id }}">
-                            <article class="discussion-post" id="post-{{ post.id }}">
-                                {% set user = post.user_profile %}
-                                {% set profile_url = url_for('creator_profile_page', creator_id=post.user_id) if user.role == 'creator' else url_for('customer_profile_page', user_id=post.user_id) %}
-                                <a href="{{ profile_url }}" class="review-avatar-link">
-                                    <img class="discussion-post-avatar" src="{{ user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ user.displayName }}'s avatar">
-                                </a>
-                                <div class="discussion-post-body">
-                                    <div class="discussion-post-header">
-                                        <a href="{{ profile_url }}" class="review-author-link">
-                                            <span class="discussion-post-author">{{ user.displayName or 'Anonymous' }}</span>
-                                        </a>
-                                        <div class="discussion-meta">
-                                            <span class="discussion-post-date">{{ post.created_at | format_datetime }}</span>
-                                            {% if current_user.uid == post.user_id or current_user.uid == skill.author_id %}
-                                                <button class="delete-post-btn" data-post-id="{{ post.id }}" title="Delete post">🗑️</button>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="discussion-post-content">
-                                        <p>{{ post.content | nl2br | safe }}</p>
-                                    </div>
-                                    <div class="discussion-post-actions">
-                                        <button class="btn-link reply-btn">Reply</button>
-                                    </div>
-                                </div>
-                            </article>
-                            <div class="replies-container" id="replies-for-{{ post.id }}">
-                                {% for reply in post.replies %}
-                                <article class="discussion-reply" id="reply-{{ reply.id }}">
-                                    {% set r_user = reply.user_profile %}
-                                    {% set r_profile_url = url_for('creator_profile_page', creator_id=reply.user_id) if r_user.role == 'creator' else url_for('customer_profile_page', user_id=reply.user_id) %}
-                                    <a href="{{ r_profile_url }}" class="review-avatar-link">
-                                        <img class="discussion-post-avatar" src="{{ r_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ r_user.displayName }}'s avatar">
+            {# Reviews and discussions are only visible to enrolled students #}
+            {% if is_enrolled %}
+                <div class="discussion-section skill-content-card">
+                    <h2>Discussion</h2>
+                    <form id="discussion-form" data-skill-id="{{ skill.id }}">
+                        <div class="form-group discussion-input-group">
+                            <img class="discussion-post-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
+                            <textarea name="content" placeholder="Ask a question..." rows="2" required></textarea>
+                            <button type="submit" class="btn btn-primary">Post</button>
+                        </div>
+                    </form>
+                    <div id="discussion-list" data-skill-id="{{ skill.id }}" data-skill-author-id="{{ skill.author_id }}" data-current-user-id="{{ current_user.uid }}">
+                        {% if discussions %}
+                            {% for post in discussions %}
+                            <div class="discussion-thread" id="thread-{{ post.id }}">
+                                <article class="discussion-post" id="post-{{ post.id }}">
+                                    {% set user = post.user_profile %}
+                                    {% set profile_url = url_for('creator_profile_page', creator_id=post.user_id) if user.role == 'creator' else url_for('customer_profile_page', user_id=post.user_id) %}
+                                    <a href="{{ profile_url }}" class="review-avatar-link">
+                                        <img class="discussion-post-avatar" src="{{ user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ user.displayName }}'s avatar">
                                     </a>
                                     <div class="discussion-post-body">
                                         <div class="discussion-post-header">
-                                            <a href="{{ r_profile_url }}" class="review-author-link">
-                                                <span class="discussion-post-author">{{ r_user.displayName or 'Anonymous' }}</span>
+                                            <a href="{{ profile_url }}" class="review-author-link">
+                                                <span class="discussion-post-author">{{ user.displayName or 'Anonymous' }}</span>
                                             </a>
                                             <div class="discussion-meta">
-                                                <span class="discussion-post-date">{{ reply.created_at | format_datetime }}</span>
-                                                {% if current_user.uid == reply.user_id or current_user.uid == skill.author_id %}
-                                                    <button class="delete-reply-btn" data-post-id="{{ post.id }}" data-reply-id="{{ reply.id }}" title="Delete reply">🗑️</button>
+                                                <span class="discussion-post-date">{{ post.created_at | format_datetime }}</span>
+                                                {% if current_user.uid == post.user_id or current_user.uid == skill.author_id %}
+                                                    <button class="delete-post-btn" data-post-id="{{ post.id }}" title="Delete post">🗑️</button>
                                                 {% endif %}
                                             </div>
                                         </div>
                                         <div class="discussion-post-content">
-                                            <p>{{ reply.content | nl2br | safe }}</p>
+                                            <p>{{ post.content | nl2br | safe }}</p>
+                                        </div>
+                                        <div class="discussion-post-actions">
+                                            <button class="btn-link reply-btn">Reply</button>
                                         </div>
                                     </div>
                                 </article>
-                                {% endfor %}
-                            </div>
-                            <div class="reply-form-container">
-                                <form class="reply-form" data-post-id="{{ post.id }}" style="display: none;">
-                                    <div class="form-group discussion-input-group">
-                                        <img class="current-user-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
-                                        <textarea name="content" placeholder="Write a reply..." rows="2" required></textarea>
-                                        <button type="submit" class="btn btn-primary">Reply</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p id="no-discussions-message" class="empty-state-message">Be the first to start the discussion!</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            {# --- Added .skill-content-card wrapper for styling --- #}
-            <div class="reviews-display-section skill-content-card">
-                <h2 id="reviews-heading">Reviews (<span id="review-count-display">{{ review_summary.count }}</span>)</h2>
-                <div class="review-list" id="review-list">
-                    {% for review in reviews %}
-                    {% if review.user_profile %}
-                    <article class="review-card" id="review-{{ review.id }}">
-                        {% set profile_url = url_for('creator_profile_page', creator_id=review.user_id) if review.user_profile.role == 'creator' else url_for('customer_profile_page', user_id=review.user_id) %}
-                        <a href="{{ profile_url }}" class="review-avatar-link">
-                            <img class="review-avatar" src="{{ review.user_profile.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ review.user_profile.displayName }}">
-                        </a>
-                        <div class="review-content">
-                            <div class="review-header">
-                                <a href="{{ profile_url }}" class="review-author-link">
-                                    <span class="review-author-name">{{ review.user_profile.displayName or "Anonymous User" }}</span>
-                                </a>
-                                <div class="review-meta">
-                                    <div class="star-rating-display" title="{{ review.rating }} out of 5 stars">
-                                        {% for i in range(1, 6) %}
-                                            <span class="star {{ 'full' if i <= review.rating else 'empty' }}"></span>
-                                        {% endfor %}
-                                    </div>
-                                    {% if current_user.uid == review.user_id or current_user.uid == skill.author_id %}
-                                    <button class="delete-review-btn" data-skill-id="{{ skill.id }}" data-review-id="{{ review.id }}" title="Delete review">🗑️</button>
-                                    {% endif %}
+                                <div class="replies-container" id="replies-for-{{ post.id }}">
+                                    {% for reply in post.replies %}
+                                    <article class="discussion-reply" id="reply-{{ reply.id }}">
+                                        {% set r_user = reply.user_profile %}
+                                        {% set r_profile_url = url_for('creator_profile_page', creator_id=reply.user_id) if r_user.role == 'creator' else url_for('customer_profile_page', user_id=reply.user_id) %}
+                                        <a href="{{ r_profile_url }}" class="review-avatar-link">
+                                            <img class="discussion-post-avatar" src="{{ r_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="{{ r_user.displayName }}'s avatar">
+                                        </a>
+                                        <div class="discussion-post-body">
+                                            <div class="discussion-post-header">
+                                                <a href="{{ r_profile_url }}" class="review-author-link">
+                                                    <span class="discussion-post-author">{{ r_user.displayName or 'Anonymous' }}</span>
+                                                </a>
+                                                <div class="discussion-meta">
+                                                    <span class="discussion-post-date">{{ reply.created_at | format_datetime }}</span>
+                                                    {% if current_user.uid == reply.user_id or current_user.uid == skill.author_id %}
+                                                        <button class="delete-reply-btn" data-post-id="{{ post.id }}" data-reply-id="{{ reply.id }}" title="Delete reply">🗑️</button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="discussion-post-content">
+                                                <p>{{ reply.content | nl2br | safe }}</p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                <div class="reply-form-container">
+                                    <form class="reply-form" data-post-id="{{ post.id }}" style="display: none;">
+                                        <div class="form-group discussion-input-group">
+                                            <img class="current-user-avatar" src="{{ current_user.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Your avatar">
+                                            <textarea name="content" placeholder="Write a reply..." rows="2" required></textarea>
+                                            <button type="submit" class="btn btn-primary">Reply</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            <p class="review-text">{{ review.text | nl2br | safe }}</p>
-                        </div>
-                    </article>
-                    {% endif %}
-                    {% else %}
-                    <p id="no-reviews-message" class="empty-state-message">This course has no reviews yet.</p>
-                    {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <p id="no-discussions-message" class="empty-state-message">Be the first to start the discussion!</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
 
-            {# --- Added .skill-content-card wrapper for styling --- #}
-            <div class="review-form-section skill-content-card">
-                <h2>Leave a Review</h2>
-                <form method="POST" action="{{ url_for('submit_review', skill_id=skill.id) }}">
-                    <div class="form-group">
-                        <label>Your Rating</label>
-                        <div class="star-rating-form">
-                            <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
-                            <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 stars">★</label>
-                            <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 stars">★</label>
-                            <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 stars">★</label>
-                            <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 star">★</label>
+                <div class="reviews-display-section skill-content-card">
+                    <h2 id="reviews-heading">Reviews (<span id="review-count-display">{{ review_summary.count }}</span>)</h2>
+                    <div class="review-list" id="review-list">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                                {% if review.user_profile %}
+                                <article class="review-card" id="review-{{ review.id }}">
+                                    {% set profile_url = url_for('creator_profile_page', creator_id=review.user_id) if review.user_profile.role == 'creator' else url_for('customer_profile_page', user_id=review.user_id) %}
+                                    <a href="{{ profile_url }}" class="review-avatar-link">
+                                        <img class="review-avatar" src="{{ review.user_profile.avatar_url or url_for('static', filename='img/avatar_placeholder.png') }}" alt="Avatar for {{ review.user_profile.displayName }}">
+                                    </a>
+                                    <div class="review-content">
+                                        <div class="review-header">
+                                            <a href="{{ profile_url }}" class="review-author-link">
+                                                <span class="review-author-name">{{ review.user_profile.displayName or "Anonymous User" }}</span>
+                                            </a>
+                                            <div class="review-meta">
+                                                <div class="star-rating-display" title="{{ review.rating }} out of 5 stars">
+                                                    {% for i in range(1, 6) %}
+                                                        <span class="star {{ 'full' if i <= review.rating else 'empty' }}"></span>
+                                                    {% endfor %}
+                                                </div>
+                                                {% if current_user.uid == review.user_id or current_user.uid == skill.author_id %}
+                                                <button class="delete-review-btn" data-skill-id="{{ skill.id }}" data-review-id="{{ review.id }}" title="Delete review">🗑️</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <p class="review-text">{{ review.text | nl2br | safe }}</p>
+                                    </div>
+                                </article>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <p id="no-reviews-message" class="empty-state-message">This course has no reviews yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="review-form-section skill-content-card">
+                    <h2>Leave a Review</h2>
+                    <form method="POST" action="{{ url_for('submit_review', skill_id=skill.id) }}">
+                        <div class="form-group">
+                            <label>Your Rating</label>
+                            <div class="star-rating-form">
+                                <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
+                                <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 stars">★</label>
+                                <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 stars">★</label>
+                                <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 stars">★</label>
+                                <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 star">★</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="review-text">Your Review</label>
-                        <textarea id="review-text" name="review_text" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </form>
-            </div>
+                        <div class="form-group">
+                            <label for="review-text">Your Review</label>
+                            <textarea id="review-text" name="review_text" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            {% endif %}
+            {# --- END ENROLLMENT-AWARE CONTENT --- #}
         </div>
 
         <div class="skill-detail-sidebar">
             <div class="sidebar-card">
-                <h3>Start Learning</h3>
-                {% if lessons %}
-                    <p>Access all {{ lessons | length }} lessons of this course now.</p>
-                    <a href="{{ url_for('course_player_page', skill_id=skill.id, lesson_id=lessons[0].id) }}" class="btn btn-primary btn-block">Go to Course</a>
+                {# --- BEGIN ENROLLMENT-AWARE SIDEBAR --- #}
+                {% if is_enrolled %}
+                    <h3>You are enrolled!</h3>
+                    {% if lessons %}
+                        <p>You have full access to all {{ lessons | length }} lessons.</p>
+                        <a href="{{ url_for('course_player_page', skill_id=skill.id, lesson_id=lessons[0].id) }}" class="btn btn-primary btn-block">Go to Course</a>
+                    {% else %}
+                        <p>Lessons are coming soon. You'll have access as soon as they are published.</p>
+                    {% endif %}
                 {% else %}
-                    <p>This course doesn't have any lessons yet.</p>
-                    <button class="btn btn-primary btn-block" disabled>Coming Soon</button>
+                    {# User is NOT enrolled #}
+                    <h3>Enroll to Start</h3>
+                    <p>Get full access to the course content and community features.</p>
+                    {% if lessons %}
+                        <form method="POST" action="{{ url_for('enroll_in_skill', skill_id=skill.id) }}">
+                            <button type="submit" class="btn btn-primary btn-block">Enroll Now (Free)</button>
+                        </form>
+                    {% else %}
+                        <p>This course doesn't have any lessons yet.</p>
+                        <button class="btn btn-primary btn-block" disabled>Coming Soon</button>
+                    {% endif %}
                 {% endif %}
+                 {# --- END ENROLLMENT-AWARE SIDEBAR --- #}
             </div>
         </div>
     </div>

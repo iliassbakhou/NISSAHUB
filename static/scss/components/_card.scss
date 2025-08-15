@@ -1,88 +1,92 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .card {
-  background-color: v.$color-white;
-  border-radius: v.$border-radius;
-  box-shadow: v.$box-shadow;
+  background-color: $color-white;
+  border-radius: $border-radius;
+  box-shadow: $shadow-light;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  flex-direction: column; // Critical for vertical structure
+  height: 100%; // Ensures cards in a grid stretch to the same height
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  }
-
-  &-image-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3; 
-    background-color: v.$color-bg-light;
-  }
-
-  &-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    display: block;
-  }
-
-  &-price-tag {
-    position: absolute;
-    bottom: 0.75rem;
-    left: 0.75rem;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: v.$color-white;
-    padding: 0.25rem 0.6rem;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  &-body {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
-
-  &-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: v.$color-text-dark;
-  }
-
-  &-category, &-author-name {
-    color: v.$color-text-light;
-    font-size: 0.9rem;
-    margin: 0;
-  }
-
-  &-author-info {
-    margin-top: auto;
-    padding-top: 1rem; 
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: v.$color-text;
-    font-size: 0.9rem;
-  }
-
-  &-author-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid v.$color-border;
+    transform: translateY(-5px);
+    box-shadow: $shadow-dark;
   }
 }
 
+.card-image-container {
+  position: relative;
+  width: 100%;
+  background-color: $color-grey-light-1;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; // Allows the body to fill the card's available space
+}
+
+.card-category {
+  color: $color-grey-dark-1;
+  font-size: 1.3rem; // Readable category size
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.card-title {
+  // Use the default h3 styles we set in _base.scss for consistency
+  font-size: 1.7rem; // Slightly smaller for cards
+  margin-bottom: auto; // The magic that pushes the footer down
+  padding-bottom: 1.5rem; // Ensures space between title and footer
+}
+
+.card-footer {
+  margin-top: auto; // This anchors the footer to the bottom of the card
+  padding-top: 1.5rem;
+  border-top: 1px solid $color-grey-light-2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-price {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: $color-primary;
+}
+
+.card-author-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.card-author-name {
+  font-size: 1.4rem;
+  color: $color-grey-dark-2;
+  font-weight: 500;
+}
+
+// The link wrapper for the card
 .card-link {
   text-decoration: none;
   color: inherit;
-  display: block; 
+  display: flex; // Important for grid layout
 }

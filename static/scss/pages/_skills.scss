@@ -1,14 +1,14 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .skills-filter-form {
     display: flex;
     flex-wrap: wrap;
-    gap: v.$spacing-unit;
-    margin-bottom: v.$spacing-unit * 2.5;
-    padding: v.$spacing-unit * 1.5;
-    background-color: v.$color-white;
-    border: 1px solid v.$color-border;
-    border-radius: v.$border-radius;
+    gap: $spacing-unit;
+    margin-bottom: $spacing-unit * 2.5;
+    padding: $spacing-unit * 1.5;
+    background-color: $color-white;
+    border: 1px solid $color-grey-light-2;
+    border-radius: $border-radius;
     
     .form-group {
         flex: 1 1 250px;

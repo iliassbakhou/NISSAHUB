@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page_title }} - NissaHub{% endblock %}
+{% block title %}Edit Your Profile - NissaHub{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="auth-container">
-        <h2>{{ page_title }}</h2>
-        <p>Keep your profile up to date so the community can get to know you.</p>
+        <h2>Edit Your Profile</h2>
+        <p class="text-center">Keep your profile up to date so the community can get to know you.</p>
 
-        <form class="auth-form" method="POST" action="{{ url_for('edit_profile_page') }}" enctype="multipart/form-data">
+        <form class="auth-form" method="POST" action="{{ url_for('edit_profile_page') }}" enctype="multipart/form-data" style="margin-top: 3rem;">
             
             <div class="form-group">
                 <label for="display_name">Display Name</label>
@@ -23,15 +23,15 @@
             <div class="form-group">
                 <label for="profile_image">Profile Picture</label>
                 {% if user.avatar_url %}
-                    <div class="current-image-preview">
-                        <img src="{{ user.avatar_url }}" alt="Your current profile picture">
-                        <span>Current Picture</span>
+                    <div style="margin-bottom: 1.5rem; text-align:center;">
+                        <img src="{{ user.avatar_url | transform_cloudinary('card') }}" alt="Your current profile picture" style="max-width: 150px; border-radius: 50%; margin-bottom: 1rem;">
+                        <p style="color: #6c757d; font-size: 1.4rem;">Current Picture</p>
                     </div>
                 {% endif %}
-                <input class="input-file" type="file" id="profile_image" name="profile_image" accept="image/png, image/jpeg">
+                <input type="file" id="profile_image" name="profile_image" accept="image/png, image/jpeg">
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">Save Changes</button>
         </form>
     </div>
 </div>

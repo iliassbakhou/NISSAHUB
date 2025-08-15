@@ -37,9 +37,23 @@ PRODUCT_CATEGORIES = [
     "Beauty & Personal Care", "Craft Supplies", "Digital Products", "Other"
 ]
 
+# --- HELPER FUNCTIONS ---
+
+def is_enrolled(user_id, skill_id):
+    """Checks if a user is enrolled in a specific skill."""
+    if not user_id or not skill_id:
+        return False
+    try:
+        enrollment_doc_ref = db.collection('enrollments').document(f'{user_id}_{skill_id}')
+        enrollment_doc = enrollment_doc_ref.get()
+        return enrollment_doc.exists
+    except Exception:
+        traceback.print_exc()
+        return False
+
 @app.context_processor
 def utility_processor():
-    return dict(floor=math.floor, ceil=math.ceil)
+    return dict(floor=math.floor, ceil=math.ceil, is_enrolled=is_enrolled)
 
 @app.template_filter('format_datetime')
 def format_datetime(timestamp):
@@ -75,6 +89,7 @@ def login_required(f):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({'status': 'error', 'message': 'Authentication required.'}), 401
             return redirect(url_for('login_page', next=request.url))
+        
         if 'user' not in g:
             try:
                 user_doc = db.collection('users').document(session['user_id']).get()
@@ -82,20 +97,30 @@ def login_required(f):
                     g.user = user_doc.to_dict()
                     g.user['uid'] = session['user_id']
                 else:
-                    g.user = {'uid': session['user_id'], 'role': None}
+                    # FIX: Create a more complete user object for users who have not yet selected a role.
+                    # This ensures `current_user.email` exists in templates.
+                    g.user = {
+                        'uid': session['user_id'],
+                        'email': session.get('email'), # <-- THE CRITICAL FIX
+                        'role': None,
+                        'displayName': None
+                    }
             except Exception as e:
                 traceback.print_exc()
                 flash(f"Could not verify your account details: {e}", "error")
                 return redirect(url_for('session_logout'))
+
         if g.user.get('isDisabled'):
             session.clear()
             flash("Your account has been disabled. Please contact support.", "error")
             return redirect(url_for('login_page'))
+
         if not g.user.get('role'):
             allowed_endpoints = ['select_role_page', 'session_logout', 'static']
             if request.endpoint not in allowed_endpoints:
                 flash("Please complete your profile by selecting a role.", "info")
                 return redirect(url_for('select_role_page'))
+        
         return f(*args, **kwargs)
     return decorated_function
 
@@ -204,11 +229,6 @@ def submit_checkout():
         traceback.print_exc()
         return redirect(url_for('checkout_page'))
 
-# --- FINAL FIX: VARIABLE NAME COLLISION ---
-# REASONING: The diagnostic print proved the data structure was correct, but the
-# template still failed. This is because the key name 'items' collides with Python's
-# built-in dict.items() method. Renaming the key to 'order_items' eliminates
-# this ambiguity, allowing Jinja to correctly iterate over the list.
 @app.route('/order/<string:order_id>')
 @login_required
 def order_confirmation_page(order_id):
@@ -228,7 +248,6 @@ def order_confirmation_page(order_id):
             'id': order_doc.id,
             'created_at': order_details.get('created_at'),
             'total_price': order_details.get('total_price'),
-            # FIX: Renamed 'items' to 'order_items' to avoid name collision in the template.
             'order_items': [item.to_dict() for item in order_doc.reference.collection('items').stream()]
         }
         
@@ -241,7 +260,6 @@ def order_confirmation_page(order_id):
 @app.route('/admin/dashboard')
 @admin_required
 def admin_dashboard_page(): return render_template('admin/dashboard.html', page_title="Admin Dashboard")
-# ... (the rest of the file is identical)
 @app.route('/admin/users')
 @admin_required
 def manage_users_page():
@@ -342,51 +360,115 @@ def skills_page():
         docs = query.order_by('created_at', direction=firestore.Query.DESCENDING).stream()
         return render_template('skills/skills.html', skills=[{'id': doc.id, **doc.to_dict()} for doc in docs], page_title="Explore Courses", search_query=search_query, categories=SKILL_CATEGORIES, selected_category=selected_category)
     except Exception: flash("An error occurred while loading courses.", "error"); traceback.print_exc(); return render_template('skills/skills.html', skills=[], page_title="Explore Courses", search_query="", categories=SKILL_CATEGORIES, selected_category="")
+
 @app.route('/skill/<string:skill_id>', methods=['GET'])
 @login_required
 def skill_detail_page(skill_id):
     try:
-        skill_ref = db.collection('skills').document(skill_id); skill_doc = skill_ref.get()
-        if not skill_doc.exists: flash("Course could not be found.", "error"); return redirect(url_for('skills_page'))
+        skill_ref = db.collection('skills').document(skill_id)
+        skill_doc = skill_ref.get()
+        if not skill_doc.exists:
+            flash("Course could not be found.", "error")
+            return redirect(url_for('skills_page'))
+
         skill_data = {'id': skill_id, **skill_doc.to_dict()}
         current_user = g.user
-        is_admin, is_author = current_user.get('isAdmin', False), skill_data.get('author_id') == session.get('user_id')
-        if not skill_data.get('isPublished', False) and not (is_admin or is_author): flash("Sorry, this course is not available.", "error"); return redirect(url_for('skills_page'))
+        
+        is_author = skill_data.get('author_id') == current_user.get('uid')
+        user_is_enrolled = is_author or current_user.get('isAdmin') or is_enrolled(current_user.get('uid'), skill_id)
+        
+        if not skill_data.get('isPublished', False) and not (is_author or current_user.get('isAdmin')):
+            flash("Sorry, this course is not available.", "error")
+            return redirect(url_for('skills_page'))
+
         author_data = db.collection('users').document(skill_data.get('author_id')).get().to_dict() or {}
         lessons_list = sorted([{'id': doc.id, **doc.to_dict()} for doc in skill_ref.collection('lessons').stream()], key=lambda l: l.get('order', 0))
-        temp_reviews_list = []; total_rating = 0; user_cache = {}
-        for doc in skill_ref.collection('reviews').stream():
-            review_data = {'id': doc.id, **doc.to_dict()}; total_rating += review_data.get('rating', 0); user_id = review_data.get('user_id')
-            if user_id:
-                if user_id not in user_cache: user_doc = db.collection('users').document(user_id).get(); user_cache[user_id] = user_doc.to_dict() if user_doc.exists else {}
-                review_data['user_profile'] = user_cache[user_id]
-            temp_reviews_list.append(review_data)
-        reviews_list = sorted(temp_reviews_list, key=lambda r: r.get('created_at', datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)), reverse=True)
-        review_summary = {"count": len(reviews_list), "average": round(total_rating / len(reviews_list), 1) if reviews_list else 0}
-        temp_discussions_list = []
-        discussion_posts_query = skill_ref.collection('discussions').stream()
-        for post_doc in discussion_posts_query:
-            post_data = {'id': post_doc.id, **post_doc.to_dict()}; user_id = post_data.get('user_id')
-            if user_id:
-                if user_id not in user_cache: user_doc = db.collection('users').document(user_id).get(); user_cache[user_id] = user_doc.to_dict() if user_doc.exists else {}
-                post_data['user_profile'] = user_cache[user_id]
-            temp_replies = []
-            replies_query = post_doc.reference.collection('replies').stream()
-            for reply_doc in replies_query:
-                reply_data = {'id': reply_doc.id, **reply_doc.to_dict()}; reply_user_id = reply_data.get('user_id')
-                if reply_user_id:
-                    if reply_user_id not in user_cache: reply_user_doc = db.collection('users').document(reply_user_id).get(); user_cache[reply_user_id] = reply_user_doc.to_dict() if reply_user_doc.exists else {}
-                    reply_data['user_profile'] = user_cache[reply_user_id]
-                temp_replies.append(reply_data)
-            post_data['replies'] = sorted(temp_replies, key=lambda r: r.get('created_at', datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)))
-            temp_discussions_list.append(post_data)
-        discussions_list = sorted(temp_discussions_list, key=lambda p: p.get('created_at', datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)))
-        return render_template('skills/skill_detail.html', skill=skill_data, lessons=lessons_list, author=author_data, reviews=reviews_list, review_summary=review_summary, discussions=discussions_list, page_title=skill_data.get('name'), skill_id=skill_id)
+        
+        reviews_list, discussions_list, review_summary = [], [], {"count": 0, "average": 0}
+        
+        if user_is_enrolled:
+            temp_reviews_list, total_rating, user_cache = [], 0, {}
+            for doc in skill_ref.collection('reviews').stream():
+                review_data = {'id': doc.id, **doc.to_dict()}
+                total_rating += review_data.get('rating', 0)
+                user_id = review_data.get('user_id')
+                if user_id and user_id not in user_cache:
+                    user_doc = db.collection('users').document(user_id).get()
+                    user_cache[user_id] = user_doc.to_dict() if user_doc.exists else {}
+                review_data['user_profile'] = user_cache.get(user_id)
+                temp_reviews_list.append(review_data)
+            
+            reviews_list = sorted(temp_reviews_list, key=lambda r: r.get('created_at'), reverse=True)
+            review_summary = {"count": len(reviews_list), "average": round(total_rating / len(reviews_list), 1) if reviews_list else 0}
+
+            temp_discussions_list = []
+            for post_doc in skill_ref.collection('discussions').stream():
+                post_data = {'id': post_doc.id, **post_doc.to_dict()}
+                user_id = post_data.get('user_id')
+                if user_id and user_id not in user_cache:
+                    user_doc = db.collection('users').document(user_id).get()
+                    user_cache[user_id] = user_doc.to_dict() if user_doc.exists else {}
+                post_data['user_profile'] = user_cache.get(user_id)
+                
+                temp_replies = []
+                for reply_doc in post_doc.reference.collection('replies').stream():
+                    reply_data = {'id': reply_doc.id, **reply_doc.to_dict()}
+                    reply_user_id = reply_data.get('user_id')
+                    if reply_user_id and reply_user_id not in user_cache:
+                        reply_user_doc = db.collection('users').document(reply_user_id).get()
+                        user_cache[reply_user_id] = reply_user_doc.to_dict() if reply_user_doc.exists else {}
+                    reply_data['user_profile'] = user_cache.get(reply_user_id)
+                    temp_replies.append(reply_data)
+                
+                post_data['replies'] = sorted(temp_replies, key=lambda r: r.get('created_at'))
+                temp_discussions_list.append(post_data)
+
+            discussions_list = sorted(temp_discussions_list, key=lambda p: p.get('created_at'))
+
+        return render_template('skills/skill_detail.html', 
+                                skill=skill_data, 
+                                lessons=lessons_list, 
+                                author=author_data, 
+                                reviews=reviews_list, 
+                                review_summary=review_summary, 
+                                discussions=discussions_list,
+                                page_title=skill_data.get('name'), 
+                                skill_id=skill_id,
+                                is_enrolled=user_is_enrolled)
     except Exception as e:
-        traceback.print_exc(); flash(f"An error occurred loading the course details: {e}", "error"); return redirect(url_for('skills_page'))
+        traceback.print_exc()
+        flash(f"An error occurred loading the course details: {e}", "error")
+        return redirect(url_for('skills_page'))
+
+@app.route('/skill/<string:skill_id>/enroll', methods=['POST'])
+@login_required
+def enroll_in_skill(skill_id):
+    try:
+        user_id = g.user.get('uid')
+        if is_enrolled(user_id, skill_id):
+            flash("You are already enrolled in this course.", "info")
+            return redirect(url_for('skill_detail_page', skill_id=skill_id))
+        
+        enrollment_id = f'{user_id}_{skill_id}'
+        enrollment_ref = db.collection('enrollments').document(enrollment_id)
+        enrollment_ref.set({
+            'user_id': user_id,
+            'skill_id': skill_id,
+            'enrolled_at': firestore.SERVER_TIMESTAMP
+        })
+        flash("You have successfully enrolled in the course!", "success")
+        return redirect(url_for('skill_detail_page', skill_id=skill_id))
+    except Exception as e:
+        traceback.print_exc()
+        flash(f"An error occurred during enrollment: {e}", "error")
+        return redirect(url_for('skill_detail_page', skill_id=skill_id))
+
 @app.route('/skill/<string:skill_id>/review', methods=['POST'])
 @login_required
 def submit_review(skill_id):
+    if not is_enrolled(g.user.get('uid'), skill_id):
+        flash("You must be enrolled in a course to leave a review.", "error")
+        return redirect(url_for('skill_detail_page', skill_id=skill_id))
     try:
         rating = request.form.get('rating'); review_text = request.form.get('review_text', '').strip()
         if not rating or not review_text: flash("Rating and review text are required.", "error")
@@ -412,6 +494,8 @@ def delete_review(skill_id, review_id):
 @app.route('/skill/<string:skill_id>/discussion', methods=['POST'])
 @login_required
 def create_discussion_post(skill_id):
+    if not is_enrolled(g.user.get('uid'), skill_id):
+        return jsonify({'status': 'error', 'message': 'You must be enrolled to post a discussion.'}), 403
     try:
         content = request.form.get('content', '').strip()
         if not content: return jsonify({'status': 'error', 'message': 'Content cannot be empty.'}), 400
@@ -424,6 +508,8 @@ def create_discussion_post(skill_id):
 @app.route('/skill/<string:skill_id>/discussion/<string:post_id>/reply', methods=['POST'])
 @login_required
 def create_discussion_reply(skill_id, post_id):
+    if not is_enrolled(g.user.get('uid'), skill_id):
+        return jsonify({'status': 'error', 'message': 'You must be enrolled to reply.'}), 403
     try:
         content = request.form.get('content', '').strip()
         if not content: return jsonify({'status': 'error', 'message': 'Reply cannot be empty.'}), 400
@@ -493,6 +579,17 @@ def customer_profile_page(user_id):
 @app.route('/course/<string:skill_id>/lesson/<string:lesson_id>')
 @login_required
 def course_player_page(skill_id, lesson_id):
+    user_is_author = False
+    try:
+        skill_doc_check = db.collection('skills').document(skill_id).get()
+        if skill_doc_check.exists and skill_doc_check.to_dict().get('author_id') == g.user.get('uid'):
+            user_is_author = True
+    except Exception: pass
+
+    if not user_is_author and not g.user.get('isAdmin') and not is_enrolled(g.user.get('uid'), skill_id):
+        flash("You are not enrolled in this course.", "error")
+        return redirect(url_for('skill_detail_page', skill_id=skill_id))
+        
     try:
         skill_ref, skill_doc = db.collection('skills').document(skill_id), db.collection('skills').document(skill_id).get()
         if not skill_doc.exists: flash("Course not found.", "error"); return redirect(url_for('skills_page'))

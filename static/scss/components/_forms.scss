@@ -1,4 +1,4 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .form-group {
     margin-bottom: 1.5rem;
@@ -8,7 +8,7 @@ label {
     display: block;
     font-weight: 500;
     margin-bottom: 0.5rem;
-    color: v.$color-text;
+    color: $color-grey-dark-2;
 }
 
 input[type="text"],
@@ -21,14 +21,14 @@ select {
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 1px solid v.$color-border;
-    border-radius: v.$border-radius;
-    background-color: v.$color-white;
+    border: 1px solid $color-grey-light-2;
+    border-radius: $border-radius;
+    background-color: $color-white;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &:focus {
         outline: none;
-        border-color: v.$color-primary;
-        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.1);
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
     }
 }

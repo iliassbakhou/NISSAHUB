@@ -1,4 +1,4 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 
 .star-rating-display {
     display: inline-flex;
@@ -12,10 +12,10 @@
         &::before { content: '★'; }
     }
     
-    .star { color: v.$color-border; }
-    .star.full { color: #ffc107; }
+    .star { color: $color-grey-light-2; }
+    .star.full { color: $color-warning; }
     .star.half {
-        background: linear-gradient(90deg, #ffc107 50%, v.$color-border 50%);
+        background: linear-gradient(90deg, $color-warning 50%, $color-grey-light-2 50%);
         -webkit-background-clip: text;
         background-clip: text; 
         -webkit-text-fill-color: transparent;
@@ -34,7 +34,7 @@
   }
 
   label {
-    color: v.$color-border;
+    color: $color-grey-light-2;
     cursor: pointer;
     transition: color 0.2s;
     padding: 0 0.1em;
@@ -42,11 +42,11 @@
 
     &:hover,
     &:hover ~ label {
-      color: #ffc107;
+      color: $color-warning;
     }
   }
 
   input[type="radio"]:checked ~ label {
-    color: #ffc107;
+    color: $color-warning;
   }
 }

@@ -1,38 +1,47 @@
-// Color Palette
+// static/scss/abstracts/_variables.scss
+
+// 1. COLOR PALETTE
+// ===================================
 $color-primary: #8e44ad;
+$color-primary-light: #c39bd3;
 $color-primary-dark: #4B164C;
+
 $color-white: #ffffff;
+$color-black: #000000;
 
-// --- Corrected & Added Variables ---
-$color-bg-light: #f8f9fa;
-$color-bg-dark: #343a40; // Was missing
-$color-border: #dee2e6;
-$color-text: #343a40;
-$color-text-dark: #212529; // Was missing
-$color-text-light: #6c757d;
-$color-text-inverse: #f8f9fa; // Was missing
+// Consistent grey scale
+$color-grey-light-1: #f8f9fa; // Used for page backgrounds
+$color-grey-light-2: #dee2e6; // Used for borders
+$color-grey-dark-1: #6c757d; // Light text
+$color-grey-dark-2: #343a40; // Main text
+$color-grey-dark-3: #212529; // Headings
 
-$color-grey-light: #e9ecef; // Was missing
-$color-grey-medium: #ced4da; // Was missing
-
+// Semantic colors
 $color-success: #28a745;
-$color-danger: #d32f2f;
-$color-danger-bg: #ffebee;
-$color-danger-border: #ffcdd2;
-// --- End Correction ---
+$color-error: #d32f2f;
+$color-warning: #ffc107;
+$color-info: #17a2b8;
 
-// Typography
-$font-primary: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-size-base: 1rem; // 16px
-$font-size-large: 1.15rem;
-$font-size-h1: 2.5rem;
-$font-size-h2: 2rem;
 
-// Layout
-$container-max-width: 1200px;
+// 2. TYPOGRAPHY
+// ===================================
+// Standardized variable name for clarity across the project
+$font-family-base: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-size-base: 1.6rem; // Changed to 1.6rem to be consistent with html font-size of 62.5%
+
+
+// 3. LAYOUT & SPACING
+// ===================================
+$container-max-width: 120rem; // 1200px
 $spacing-unit: 1rem;
-$header-height: 70px;
+$header-height: 7rem; // 70px
 
-// Components
-$border-radius: 8px;
-$box-shadow: 0 5px 15px rgba($color-text, 0.08);
+
+// 4. COMPONENTS
+// ===================================
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
+$border-radius: $border-radius-md; // The new default border-radius
+$shadow-light: 0 2px 8px rgba($color-black, 0.07);
+$shadow-dark: 0 5px 15px rgba($color-black, 0.1);

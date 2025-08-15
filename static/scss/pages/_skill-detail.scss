@@ -1,4 +1,4 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 @use 'sass:color';
 
 .skill-detail-container {
@@ -15,7 +15,7 @@
 
 .skill-detail-main {
     .skill-title {
-        font-size: 2.8rem;
+        font-size: 3.2rem; // Adjusted to match h1 style
         font-weight: 700;
         margin-bottom: 0.75rem;
         line-height: 1.2;
@@ -27,20 +27,24 @@
         align-items: center;
         gap: 0.5rem 1.5rem;
         margin-bottom: 2rem;
-        color: v.$color-text-light;
-        font-size: 0.95rem;
+        color: $color-grey-dark-1;
+        font-size: 1.5rem; // Increased font size
 
         .meta-rating { display: flex; align-items: center; gap: 0.5rem; }
         .skill-category-badge {
-            background-color: color.adjust(v.$color-primary, $alpha: -0.9);
-            color: v.$color-primary;
+            background-color: color.adjust($color-primary, $alpha: -0.9);
+            color: $color-primary;
             padding: 4px 10px;
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 1.3rem; // Increased font size
             font-weight: 600;
         }
     }
 }
+// ... unchanged styles omitted for this explanation...
+
+// Full file content provided below, starting from the top.
+// The code from here to the end of the file is the corrected and complete version.
 
 .skill-image-container {
     margin-bottom: 2.5rem;
@@ -48,24 +52,23 @@
         width: 100%;
         aspect-ratio: 16 / 9;
         object-fit: cover;
-        border-radius: v.$border-radius;
-        box-shadow: v.$box-shadow;
+        border-radius: $border-radius;
+        box-shadow: $shadow-light;
     }
 }
 
 .skill-content-card {
-    background-color: v.$color-white;
-    border: 1px solid v.$color-border;
-    border-radius: v.$border-radius;
-    padding: 2rem;
+    background-color: $color-white;
+    border: 1px solid $color-grey-light-2;
+    border-radius: $border-radius;
+    padding: 2.5rem; // Increased padding
     margin-bottom: 2.5rem;
 
     h2 {
         margin-top: 0;
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
-        border-bottom: 1px solid v.$color-border;
-        font-size: 1.6rem;
+        border-bottom: 1px solid $color-grey-light-2;
     }
 }
 
@@ -73,27 +76,33 @@
     list-style: none;
     padding-left: 0;
     li {
-        padding: 0.75rem 0 0.75rem 2rem;
+        padding: 1rem 0 1rem 2rem;
         position: relative;
-        font-size: 1.1rem;
-        border-bottom: 1px solid v.$color-bg-light;
+        font-size: 1.6rem;
+        border-bottom: 1px solid $color-grey-light-1;
         &:last-child { border-bottom: none; }
         &::before {
             content: '✓';
-            color: v.$color-primary;
+            color: $color-primary;
             position: absolute;
             left: 0;
-            top: 0.75rem;
+            top: 1rem;
             font-weight: bold;
         }
     }
 }
 
-// --- START: DEFINITIVE FIX FOR DISCUSSION & REVIEWS ---
+// Discussion & Reviews Section Fixes
 .discussion-input-group, .reply-form .form-group {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
+    textarea { // Targeting the text area directly
+        font-size: 1.5rem;
+        &::placeholder {
+            color: $color-grey-dark-1;
+        }
+    }
 }
 
 .discussion-post-avatar, .current-user-avatar {
@@ -106,9 +115,9 @@
 
 .discussion-post, .discussion-reply {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 1.5rem 0;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid $color-grey-light-2;
 }
 
 .discussion-thread > .discussion-post {
@@ -116,12 +125,12 @@
     padding-bottom: 1rem;
 }
 .discussion-thread:not(:last-child) {
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid $color-grey-light-2;
 }
 
 .replies-container {
-    padding-left: 50px; // Indent replies
-    border-left: 2px solid v.$color-bg-light;
+    padding-left: 50px; 
+    border-left: 2px solid $color-grey-light-1;
     margin-left: 20px;
     
     .discussion-reply {
@@ -130,7 +139,7 @@
     }
 }
 .reply-form-container {
-     padding-left: 70px; // Indent reply form
+     padding-left: 70px;
      padding-top: 1rem;
 }
 
@@ -144,37 +153,41 @@
 
 .discussion-post-author, .review-author-name {
     font-weight: 600;
-    color: v.$color-text-dark;
+    color: $color-grey-dark-3;
+    font-size: 1.5rem; // Increased font size
 }
 .review-author-link, .discussion-post-header a {
     text-decoration: none;
-    &:hover { .discussion-post-author, .review-author-name { color: v.$color-primary; }}
+    &:hover { .discussion-post-author, .review-author-name { color: $color-primary; }}
 }
 
 .discussion-meta, .review-meta {
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-size: 0.85rem;
-    color: v.$color-text-light;
+    font-size: 1.3rem; // Increased font size
+    color: $color-grey-dark-1;
 }
 
 .delete-post-btn, .delete-reply-btn, .delete-review-btn {
-    background: none; border: none; cursor: pointer; color: v.$color-text-light;
+    background: none; border: none; cursor: pointer; color: $color-grey-dark-1;
     opacity: 0.5; transition: opacity 0.2s;
-    &:hover { opacity: 1; color: v.$color-danger; }
+    &:hover { opacity: 1; color: $color-error; }
 }
 
 .discussion-post-content, .review-text {
-    p { margin-bottom: 0; }
+    p { 
+      margin-bottom: 0; 
+      font-size: 1.6rem; // Increased font size
+    }
 }
 
 .review-list {
     .review-card {
         display: flex;
-        gap: 1rem;
+        gap: 1.5rem;
         padding: 1.5rem 0;
-        border-bottom: 1px solid v.$color-border;
+        border-bottom: 1px solid $color-grey-light-2;
         &:last-child { border-bottom: none; }
     }
     .review-avatar {
@@ -185,19 +198,18 @@
     }
     .review-content { flex: 1; }
 }
-// --- END: DEFINITIVE FIX ---
 
 .skill-detail-sidebar {
     position: sticky;
-    top: v.$spacing-unit * 2;
+    top: $spacing-unit * 2;
     align-self: start;
 
     .sidebar-card {
-        background: v.$color-white;
-        border: 1px solid v.$color-border;
-        border-radius: v.$border-radius;
-        box-shadow: v.$box-shadow;
-        padding: 2rem;
+        background: $color-white;
+        border: 1px solid $color-grey-light-2;
+        border-radius: $border-radius;
+        box-shadow: $shadow-light;
+        padding: 2.5rem; // Increased padding
         text-align: center;
 
         h3 {
@@ -206,7 +218,7 @@
         }
 
         p {
-            color: v.$color-text-light;
+            color: $color-grey-dark-1;
             margin-bottom: 1.5rem;
         }
     }

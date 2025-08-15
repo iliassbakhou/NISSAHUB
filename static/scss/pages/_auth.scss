@@ -1,0 +1,138 @@
+@use '../abstracts/variables' as *;
+
+.auth-page, .auth-container {
+    // Shared layout for login, register, etc.
+    width: 100%;
+    max-width: 480px; 
+    margin: 4rem auto;
+    padding: 2.5rem;
+    border-radius: $border-radius-lg;
+    background-color: $color-white;
+    box-shadow: $shadow-light;
+
+    h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+        color: $color-primary-dark;
+    }
+    
+    p.text-center {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: $color-grey-dark-2;
+    }
+}
+
+.auth-links {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+
+    p { margin-bottom: 0.5rem; }
+    a {
+        color: $color-primary;
+        font-weight: 500;
+        text-decoration: none;
+        &:hover { text-decoration: underline; }
+    }
+}
+
+.select-role-layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 1200px;
+    margin: 4rem auto;
+    background-color: $color-white;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-dark;
+    overflow: hidden;
+
+    // Make it stack on smaller screens
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: none;
+        margin: 0;
+    }
+}
+
+.branding-column {
+    background-image: linear-gradient(to top, rgba($color-black, 0.7), rgba($color-black, 0.4)), url('../img/auth-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem;
+    text-align: center;
+    color: $color-white;
+
+    .auth-logo {
+        width: 120px;
+        margin-bottom: 2rem;
+        filter: brightness(0) invert(1);
+    }
+    
+    h1, p {
+        text-shadow: 0 2px 8px rgba($color-black, 0.8);
+    }
+    
+    h1 { font-size: 2.8rem; margin-bottom: 1rem; }
+    p { font-size: 1.6rem; max-width: 40ch; opacity: 0.95; }
+}
+
+.form-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem;
+}
+
+.role-selection-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.role-option {
+    position: relative;
+    input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+}
+
+.radio-card-label {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem; // More padding
+    border: 2px solid $color-grey-light-2;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: $color-white;
+
+    .role-icon { color: $color-grey-dark-1; transition: color 0.2s; }
+    .role-text { display: flex; flex-direction: column; }
+    .role-title { font-size: 1.6rem; color: $color-grey-dark-3; font-weight: 600; margin-bottom: 0.25rem;}
+    .role-description { font-size: 1.4rem; color: $color-grey-dark-1; } // Readable size
+
+    &:hover { border-color: $color-primary-light; }
+}
+
+input[type="radio"]:checked + .radio-card-label {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.3); // Glow effect
+
+    .role-icon { color: $color-primary; }
+    .role-title { color: $color-primary-dark; }
+}

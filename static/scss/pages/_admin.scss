@@ -1,51 +1,51 @@
-@use '../abstracts/variables' as v;
+@use '../abstracts/variables' as *;
 @use 'sass:color';
 
 .admin-layout {
     display: grid;
     grid-template-columns: 240px 1fr;
     max-width: 1400px;
-    margin: (v.$spacing-unit * 2) auto;
-    gap: v.$spacing-unit * 2;
-    padding: 0 v.$spacing-unit * 2;
+    margin: ($spacing-unit * 2) auto;
+    gap: $spacing-unit * 2;
+    padding: 0 $spacing-unit * 2;
 }
 
 .admin-sidebar {
-    background-color: v.$color-white;
-    padding: v.$spacing-unit * 1.5;
-    border-radius: v.$border-radius;
-    border: 1px solid v.$color-border;
+    background-color: $color-white;
+    padding: $spacing-unit * 1.5;
+    border-radius: $border-radius;
+    border: 1px solid $color-grey-light-2;
     align-self: start;
     position: sticky;
-    top: v.$spacing-unit * 2;
+    top: $spacing-unit * 2;
 }
 
 .admin-nav-header {
-    margin: 0 0 v.$spacing-unit 0;
+    margin: 0 0 $spacing-unit 0;
     font-size: 1.2rem;
-    color: v.$color-text;
-    padding-bottom: v.$spacing-unit * 0.75;
-    border-bottom: 1px solid v.$color-border;
+    color: $color-grey-dark-2;
+    padding-bottom: $spacing-unit * 0.75;
+    border-bottom: 1px solid $color-grey-light-2;
 }
 
 .admin-nav-link {
     display: block;
     padding: 0.75rem 1rem;
     text-decoration: none;
-    color: v.$color-text-light;
+    color: $color-grey-dark-1;
     border-radius: 6px;
     margin-bottom: 0.5rem;
     font-weight: 500;
     transition: background-color 0.2s, color 0.2s;
 
     &:hover {
-        background-color: v.$color-bg-light;
-        color: v.$color-primary;
+        background-color: $color-grey-light-1;
+        color: $color-primary;
         text-decoration: none;
     }
     &.active {
-        background-color: v.$color-primary;
-        color: v.$color-white;
+        background-color: $color-primary;
+        color: $color-white;
         font-weight: 700;
     }
     &.disabled {
@@ -61,17 +61,17 @@
 
 .admin-header h1 {
     font-size: 2.2rem;
-    color: v.$color-primary-dark;
-    border-bottom: 1px solid v.$color-border;
-    padding-bottom: v.$spacing-unit;
-    margin-bottom: v.$spacing-unit * 2;
+    color: $color-primary-dark;
+    border-bottom: 1px solid $color-grey-light-2;
+    padding-bottom: $spacing-unit;
+    margin-bottom: $spacing-unit * 2;
 }
 
 .admin-content-area {
-    background: v.$color-white;
-    padding: v.$spacing-unit * 2;
-    border-radius: v.$border-radius;
-    border: 1px solid v.$color-border;
+    background: $color-white;
+    padding: $spacing-unit * 2;
+    border-radius: $border-radius;
+    border: 1px solid $color-grey-light-2;
 
     p {
         line-height: 1.7;
@@ -80,17 +80,17 @@
 }
 
 .quick-actions {
-    margin-top: v.$spacing-unit * 2;
-    background-color: v.$color-bg-light;
-    border: 1px solid v.$color-border;
-    border-left: 4px solid v.$color-primary;
-    padding: v.$spacing-unit * 1.5;
-    border-radius: v.$border-radius;
+    margin-top: $spacing-unit * 2;
+    background-color: $color-grey-light-1;
+    border: 1px solid $color-grey-light-2;
+    border-left: 4px solid $color-primary;
+    padding: $spacing-unit * 1.5;
+    border-radius: $border-radius;
 
     h3 {
         margin-top: 0;
-        margin-bottom: v.$spacing-unit;
-        color: v.$color-primary-dark;
+        margin-bottom: $spacing-unit;
+        color: $color-primary-dark;
     }
     
     a {
@@ -108,16 +108,16 @@
     border-collapse: collapse;
 
     th, td {
-        padding: v.$spacing-unit;
+        padding: $spacing-unit;
         text-align: left;
-        border-bottom: 1px solid v.$color-border;
+        border-bottom: 1px solid $color-grey-light-2;
         vertical-align: middle;
         white-space: nowrap;
     }
 
     thead th {
-        background-color: v.$color-bg-light;
-        color: v.$color-text-light;
+        background-color: $color-grey-light-1;
+        color: $color-grey-dark-1;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.8rem;
@@ -125,7 +125,7 @@
     }
 
     tbody tr:hover {
-        background-color: color.adjust(v.$color-bg-light, $lightness: -2%);
+        background-color: color.adjust($color-grey-light-1, $lightness: -2%);
     }
 
     .table-cell-main-text {
@@ -134,13 +134,13 @@
 
     .table-cell-sub-text {
         font-size: 0.85rem;
-        color: v.$color-text-light;
+        color: $color-grey-dark-1;
         margin-top: 2px;
     }
 
     .category-badge {
-        background-color: color.adjust(v.$color-primary, $alpha: -0.9);
-        color: v.$color-primary;
+        background-color: color.adjust($color-primary, $alpha: -0.9);
+        color: $color-primary;
         padding: 4px 10px;
         border-radius: 12px;
         font-size: 0.8rem;
@@ -159,22 +159,22 @@
 
         .btn-outline {
             background-color: transparent;
-            border: 1px solid v.$color-text-light;
-            color: v.$color-text-light;
-            &:hover { background-color: v.$color-text-light; color: v.$color-white; }
+            border: 1px solid $color-grey-dark-1;
+            color: $color-grey-dark-1;
+            &:hover { background-color: $color-grey-dark-1; color: $color-white; }
         }
 
         .btn-primary-outline {
             background-color: transparent;
-            border: 1px solid v.$color-primary;
-            color: v.$color-primary;
-            &:hover { background-color: v.$color-primary; color: v.$color-white; }
+            border: 1px solid $color-primary;
+            color: $color-primary;
+            &:hover { background-color: $color-primary; color: $color-white; }
         }
     }
     .table-no-results {
         text-align: center;
-        padding: (v.$spacing-unit * 3) 0;
-        color: v.$color-text-light;
+        padding: ($spacing-unit * 3) 0;
+        color: $color-grey-dark-1;
     }
 }
 
@@ -184,6 +184,6 @@
     }
     .admin-sidebar {
         position: static;
-        margin-bottom: v.$spacing-unit * 2;
+        margin-bottom: $spacing-unit * 2;
     }
 }
